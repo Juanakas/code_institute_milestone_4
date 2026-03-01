@@ -2,6 +2,10 @@
 
 Bachata Club is a full-stack Django subscription platform where users can register, subscribe monthly via Stripe, and access members-only Bachata lesson videos. New videos are intended to be released weekly and are visible only to active subscribers.
 
+## Project Description
+
+Bachata Club is a subscription-based learning platform where users pay monthly to access exclusive Bachata dance video lessons, with new members-only content released weekly.
+
 ## Quick Start (Clone + Run)
 
 ```bash
