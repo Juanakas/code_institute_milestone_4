@@ -21,7 +21,7 @@ staticfiles/
 # IDE
 .vscode/
 
-# Local briefing/reference files not for repo
+# Assessment/reference source files (excluded from repo)
 Full_stack_Django_assessment_criteria.pdf
 Create_project_prompt.txt
 Full-Stack_framework.txt
