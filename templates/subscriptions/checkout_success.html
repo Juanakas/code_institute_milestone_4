@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Successful | Bachata Club{% endblock %}
+
+{% block content %}
+<div class="alert alert-success">
+    <h1 class="h4">Payment successful</h1>
+    <p>Your subscription is being activated. If access does not update immediately, refresh in a few seconds.</p>
+</div>
+<a class="btn btn-primary" href="{% url 'videos:member-library' %}">Go to Member Library</a>
+{% endblock %}

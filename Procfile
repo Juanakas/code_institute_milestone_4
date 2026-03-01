@@ -1,0 +1,1 @@
+web: gunicorn bachata_club.wsgi

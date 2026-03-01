@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.pyd
+*.pyo
+
+# Virtual env
+.venv/
+venv/
+
+# Django
+media/
+staticfiles/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+
+# Local briefing/reference files not for repo
+Full_stack_Django_assessment_criteria.pdf
+Create_project_prompt.txt
+Full-Stack_framework.txt
+Full-Stack_Project_Requirements.txt
+admin.txt
+admin/

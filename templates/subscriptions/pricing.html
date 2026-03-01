@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Membership Plans | Bachata Club{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Membership Plans</h1>
+<p class="text-muted">Subscribe monthly to unlock the full Bachata lesson library and weekly new releases.</p>
+
+<div class="row g-4">
+    {% for plan in plans %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body d-flex flex-column">
+                <h2 class="h5">{{ plan.name }}</h2>
+                <p class="display-6">€{{ plan.monthly_price }}<span class="fs-6"> / month</span></p>
+                <ul>
+                    <li>Members-only Bachata videos</li>
+                    <li>Weekly lesson releases</li>
+                    <li>Practice log tracking</li>
+                </ul>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'subscriptions:checkout' plan.id %}" class="btn btn-primary mt-auto">Subscribe</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary mt-auto">Login to Subscribe</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-warning">No active plans configured yet. Add a plan in admin with a Stripe price ID.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

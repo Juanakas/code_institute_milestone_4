@@ -1,0 +1,8 @@
+body {
+    min-height: 100vh;
+}
+
+.card h2,
+.card h5 {
+    margin-bottom: 0.5rem;
+}

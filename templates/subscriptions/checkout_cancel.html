@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout Canceled | Bachata Club{% endblock %}
+
+{% block content %}
+<div class="alert alert-warning">
+    <h1 class="h4">Checkout canceled</h1>
+    <p>Your payment was not completed. You can try again anytime.</p>
+</div>
+<a class="btn btn-primary" href="{% url 'subscriptions:pricing' %}">Back to Pricing</a>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Subscription Status | Bachata Club{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Your Subscription Status</h1>
+
+{% if membership %}
+<div class="card card-body">
+    <p><strong>Status:</strong> {{ membership.get_status_display }}</p>
+    <p><strong>Current period ends:</strong> {{ membership.current_period_end|default:"Not available yet" }}</p>
+    {% if membership.has_access %}
+        <a class="btn btn-success" href="{% url 'videos:member-library' %}">Open Member Videos</a>
+    {% else %}
+        <a class="btn btn-primary" href="{% url 'subscriptions:pricing' %}">Activate Membership</a>
+    {% endif %}
+</div>
+{% else %}
+<div class="alert alert-info">No subscription record found yet.</div>
+<a class="btn btn-primary" href="{% url 'subscriptions:pricing' %}">See Plans</a>
+{% endif %}
+{% endblock %}
