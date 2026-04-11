@@ -1,22 +1,62 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Subscription Status | Bachata Club{% endblock %}
 
-{% block content %}
-<h1 class="h3 mb-3">Your Subscription Status</h1>
+{% block body_class %}subscriptions-page{% endblock %}
 
-{% if membership %}
-<div class="card card-body">
-    <p><strong>Status:</strong> {{ membership.get_status_display }}</p>
-    <p><strong>Current period ends:</strong> {{ membership.current_period_end|default:"Not available yet" }}</p>
-    {% if membership.has_access %}
-        <a class="btn btn-success" href="{% url 'videos:member-library' %}">Open Member Videos</a>
-    {% else %}
-        <a class="btn btn-primary" href="{% url 'subscriptions:pricing' %}">Activate Membership</a>
-    {% endif %}
-</div>
-{% else %}
-<div class="alert alert-info">No subscription record found yet.</div>
-<a class="btn btn-primary" href="{% url 'subscriptions:pricing' %}">See Plans</a>
-{% endif %}
+{% block content %}
+<section class="subscription-hero">
+    <div class="subscription-hero__bg" aria-hidden="true"></div>
+
+    <div class="page-shell subscription-shell content-columns">
+        <section class="content-column">
+            <header class="page-header subscription-header">
+                <div>
+                    <p class="page-kicker">Account</p>
+                    <h1 class="page-title">Your Subscription Status</h1>
+                    <p class="page-lead">Check your access and jump back into the member library when you are ready.</p>
+                </div>
+            </header>
+
+            {% if membership %}
+            <div class="status-panel">
+                <span class="status-pill">{{ membership.get_status_display }}</span>
+                {% if membership.has_access %}
+                <div class="alert alert-info mt-3 mb-3">
+                    <strong>Free trial:</strong> {{ membership.days_remaining }} day{{ membership.days_remaining|pluralize }} remaining
+                </div>
+                {% endif %}
+                <p class="page-lead mt-3 mb-3">Current period ends: {{ membership.current_period_end|default:"Not available yet" }}</p>
+                <div class="modern-actions">
+                    {% if membership.has_access %}
+                        <a class="btn btn-success" href="{% url 'videos:member-library' %}">Open Member Videos</a>
+                    {% else %}
+                        <form method="post" action="{% url 'subscriptions:activate_free' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Subscribe for free for 30-days</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="message-panel">
+                <p class="subtle-note mb-3">No subscription record found yet.</p>
+                <form method="post" action="{% url 'subscriptions:activate_free' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Subscribe for free for 30-days</button>
+                </form>
+            </div>
+            {% endif %}
+        </section>
+
+        <aside class="content-side">
+            <div class="panel-card">
+                <p class="page-kicker">Overview</p>
+                <h2 class="panel-title">Stay on track</h2>
+                <p class="panel-text">Your subscription unlocks structured Bachata progress, practice logs, and the member video library.</p>
+            </div>
+        </aside>
+    </div>
+</section>
 {% endblock %}

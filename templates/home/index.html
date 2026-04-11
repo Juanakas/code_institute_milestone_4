@@ -1,49 +1,101 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Bachata Club | Learn Weekly{% endblock %}
+{% block title %}Juanakas_Bachata/home{% endblock %}
+
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body_class %}home-page{% endblock %}
+{% block main_class %}home-main{% endblock %}
 
 {% block content %}
-<section class="p-5 mb-4 bg-light rounded-3">
-    <div class="container-fluid py-3">
-        <h1 class="display-5 fw-bold">Weekly Bachata Lessons for Members</h1>
-        <p class="col-md-9 fs-5">Join a subscription-based dance platform focused on Bachata technique, partnerwork, musicality, and styling. New lessons are released weekly and available only to active members.</p>
-        <div class="d-flex gap-2 flex-wrap">
-            <a class="btn btn-primary btn-lg" href="{% url 'subscriptions:pricing' %}">View Membership Plans</a>
-            {% if user.is_authenticated and has_active_membership %}
-                <a class="btn btn-outline-dark btn-lg" href="{% url 'videos:member-library' %}">Go to Member Videos</a>
-            {% elif user.is_authenticated %}
-                <a class="btn btn-outline-dark btn-lg" href="{% url 'subscriptions:pricing' %}">Activate Membership</a>
-            {% else %}
-                <a class="btn btn-outline-dark btn-lg" href="{% url 'signup' %}">Create Account</a>
-            {% endif %}
-        </div>
-    </div>
-</section>
+<section class="home-hero" aria-label="Juanakas Bachata homepage">
+    <div class="home-hero__overlay" aria-hidden="true"></div>
 
-<section class="row g-4">
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">Structured Learning</h5>
-                <p class="card-text">Progress through beginner, intermediate, and advanced lessons with clear weekly release schedules.</p>
+    <div class="home-hero__inner">
+        <div class="home-hero__content">
+            <div class="home-brand">
+                <div class="home-brand__mark" aria-label="JB logo">JB</div>
+                <div class="home-brand__copy">
+                    <p class="home-brand__eyebrow">Juanakas Bachata Club</p>
+                    <p class="home-brand__label">Modern Bachata training, social nights, and member learning</p>
+                </div>
+            </div>
+
+            <div class="home-heading-group">
+                <h1 class="home-title">Juanakas Bachata</h1>
+                <p class="home-lead">
+                    A polished membership experience for Bachata dancers who want structured learning,
+                    strong musicality, and a more confident social style.
+                </p>
+            </div>
+
+            <div class="home-actions">
+                <a class="home-btn home-btn-primary" href="{% url 'subscriptions:pricing' %}">View Membership Plans</a>
+                {% if user.is_authenticated and has_active_membership %}
+                <a class="home-btn home-btn-secondary" href="{% url 'videos:member-library' %}">Enter Member Library</a>
+                {% elif user.is_authenticated %}
+                <a class="home-btn home-btn-secondary" href="{% url 'subscriptions:pricing' %}">Activate Membership</a>
+                {% else %}
+                <a class="home-btn home-btn-secondary" href="{% url 'signup' %}">Create Account</a>
+                {% endif %}
+            </div>
+
+            <div class="home-metrics">
+                <div class="home-metric">
+                    <span class="home-metric__value">Weekly</span>
+                    <span class="home-metric__label">new learning content</span>
+                </div>
+                <div class="home-metric">
+                    <span class="home-metric__value">Members</span>
+                    <span class="home-metric__label">only video library</span>
+                </div>
+                <div class="home-metric">
+                    <span class="home-metric__value">Practice</span>
+                    <span class="home-metric__label">logs and progress tracking</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="home-hero__visual">
+            <div class="home-image-frame">
+                <img
+                    class="home-image"
+                    src="{% static 'images/home-hero-bachata.jpg' %}"
+                    alt="A couple dancing Bachata on a dance floor"
+                    loading="eager"
+                    decoding="async"
+                >
+                <div class="home-image__tint" aria-hidden="true"></div>
+                <div class="home-image__tag">Premium Bachata Atmosphere</div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">Members-Only Library</h5>
-                <p class="card-text">Only users with an active subscription can access and watch videos from the members area.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">Practice Tracking</h5>
-                <p class="card-text">Members can create and edit dance practice logs to stay accountable and track progress over time.</p>
-            </div>
-        </div>
+
+    <div class="home-features">
+        <article class="home-card">
+            <p class="home-card__kicker" style="color:#f0dcc6;">Technique</p>
+            <h2 class="home-card__title">Structured Progress</h2>
+            <p class="home-card__text">Learn fundamentals, partnerwork, and styling in a clear weekly path.</p>
+        </article>
+
+        <article class="home-card">
+            <p class="home-card__kicker" style="color:#f0dcc6;">Community</p>
+            <h2 class="home-card__title">Social Dance Focus</h2>
+            <p class="home-card__text">Build confidence for the floor with rhythm, connection, and flow.</p>
+        </article>
+
+        <article class="home-card">
+            <p class="home-card__kicker" style="color:#f0dcc6;">Consistency</p>
+            <h2 class="home-card__title">Weekly Learning</h2>
+            <p class="home-card__text">Stay accountable with new lessons, practice logs, and member access.</p>
+        </article>
     </div>
 </section>
 {% endblock %}
+
+{% block scripts %}{% endblock %}

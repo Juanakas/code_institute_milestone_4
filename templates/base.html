@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Bachata Club{% endblock %}</title>
+    <title>{% block title %}Juanakas_Bachata{% endblock %}</title>
+    {% block extra_head %}{% endblock %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home:index' %}">Bachata Club</a>
+<body class="{% block body_class %}{% endblock %}">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark site-navbar">
+        <div class="container nav-shell">
+            <a class="navbar-brand nav-brand" href="{% url 'home:index' %}">Juanakas_Bachata</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <div class="collapse navbar-collapse nav-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-primary-links">
                     <li class="nav-item"><a class="nav-link" href="{% url 'home:index' %}">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'subscriptions:pricing' %}">Pricing</a></li>
                     {% if has_active_membership %}
@@ -23,7 +25,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'practice:list' %}">Practice Logs</a></li>
                     {% endif %}
                 </ul>
-                <ul class="navbar-nav">
+                <ul class="navbar-nav nav-account-links">
                     {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'subscriptions:status' %}">Subscription</a></li>
                     <li class="nav-item">
@@ -41,7 +43,7 @@
         </div>
     </nav>
 
-    <main class="container py-4">
+    <main class="{% block main_class %}container py-4{% endblock %}">
         {% if messages %}
             {% for message in messages %}
             <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">{{ message }}</div>

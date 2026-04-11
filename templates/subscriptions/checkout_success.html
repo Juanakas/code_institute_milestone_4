@@ -1,11 +1,23 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Payment Successful | Bachata Club{% endblock %}
 
+{% block body_class %}subscriptions-page{% endblock %}
+
 {% block content %}
-<div class="alert alert-success">
-    <h1 class="h4">Payment successful</h1>
-    <p>Your subscription is being activated. If access does not update immediately, refresh in a few seconds.</p>
-</div>
-<a class="btn btn-primary" href="{% url 'videos:member-library' %}">Go to Member Library</a>
+<section class="subscription-hero">
+    <div class="subscription-hero__bg" style="background-image: linear-gradient(145deg, rgba(11, 15, 24, 0.84), rgba(11, 15, 24, 0.58)), url('{% static 'images/subscriptions-woman-bachata.jpg' %}');" aria-hidden="true"></div>
+
+    <div class="page-shell subscription-shell">
+        <div class="status-panel">
+            <p class="page-kicker">Checkout</p>
+            <h1 class="page-title">Payment successful</h1>
+            <p class="page-lead">Your subscription is being activated. If access does not update immediately, refresh in a few seconds.</p>
+            <div class="modern-actions mt-3">
+                <a class="btn btn-primary" href="{% url 'videos:member-library' %}">Go to Member Library</a>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

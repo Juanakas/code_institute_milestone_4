@@ -48,3 +48,10 @@ class Membership(models.Model):
 		if not self.current_period_end:
 			return False
 		return self.current_period_end >= timezone.now()
+
+	@property
+	def days_remaining(self):
+		if not self.current_period_end or not self.has_access:
+			return 0
+		delta = self.current_period_end.date() - timezone.now().date()
+		return max(0, delta.days)

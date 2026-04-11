@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -28,7 +29,28 @@ def pricing(request):
 
 
 @login_required
+def activate_free_membership(request):
+	if request.method != 'POST':
+		return redirect('subscriptions:pricing')
+
+	membership = getattr(request.user, 'membership', None)
+	if membership is None:
+		membership = Membership.objects.create(user=request.user)
+
+	membership.status = Membership.STATUS_ACTIVE
+	membership.current_period_end = timezone.now() + datetime.timedelta(days=30)
+	membership.save(update_fields=['status', 'current_period_end', 'updated_at'])
+
+	messages.success(request, 'Your free 30-day membership is now active. Welcome to the member library!')
+	return redirect('videos:member-library')
+
+
 def create_checkout_session(request, plan_id):
+	if not request.user.is_authenticated:
+		messages.info(request, 'Please log in or create an account to subscribe.')
+		login_url = reverse('login')
+		return redirect(f'{login_url}?next={request.get_full_path()}')
+
 	plan = get_object_or_404(SubscriptionPlan, id=plan_id, is_active=True)
 	membership = getattr(request.user, 'membership', None)
 	if membership is None:
@@ -36,6 +58,13 @@ def create_checkout_session(request, plan_id):
 
 	if not settings.STRIPE_SECRET_KEY:
 		messages.error(request, 'Stripe is not configured yet. Add Stripe keys to continue.')
+		return redirect('subscriptions:pricing')
+
+	if plan.stripe_price_id.startswith('price_test_'):
+		messages.error(
+			request,
+			'This plan is still using a placeholder Stripe price ID. Add a real Stripe Price ID in admin to continue.',
+		)
 		return redirect('subscriptions:pricing')
 
 	try:
@@ -62,8 +91,14 @@ def create_checkout_session(request, plan_id):
 			cancel_url=request.build_absolute_uri('/subscriptions/cancel/'),
 			metadata={'plan_id': plan.id},
 		)
+	except stripe.error.InvalidRequestError as error:
+		messages.error(
+			request,
+			f'Checkout cannot start because the Stripe price ID is invalid for this plan: {str(error)}',
+		)
+		return redirect('subscriptions:pricing')
 	except stripe.error.StripeError as error:
-		messages.error(request, f'Stripe checkout failed: {str(error)}')
+		messages.error(request, f'Stripe checkout failed. Please try again. Details: {str(error)}')
 		return redirect('subscriptions:pricing')
 
 	return redirect(checkout_session.url, code=303)

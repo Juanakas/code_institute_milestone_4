@@ -1,35 +1,49 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Membership Plans | Bachata Club{% endblock %}
 
-{% block content %}
-<h1 class="h3 mb-3">Membership Plans</h1>
-<p class="text-muted">Subscribe monthly to unlock the full Bachata lesson library and weekly new releases.</p>
+{% block body_class %}subscriptions-page{% endblock %}
 
-<div class="row g-4">
-    {% for plan in plans %}
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body d-flex flex-column">
-                <h2 class="h5">{{ plan.name }}</h2>
-                <p class="display-6">€{{ plan.monthly_price }}<span class="fs-6"> / month</span></p>
-                <ul>
-                    <li>Members-only Bachata videos</li>
-                    <li>Weekly lesson releases</li>
-                    <li>Practice log tracking</li>
-                </ul>
+{% block content %}
+<section class="subscription-hero">
+    <div class="subscription-hero__bg" aria-hidden="true"></div>
+
+    <div class="page-shell subscription-shell">
+        <header class="page-header subscription-header">
+            <div>
+                <p class="page-kicker">Membership</p>
+                <h1 class="page-title">Membership Plans</h1>
+                <p class="page-lead">Subscribe monthly to unlock the full Bachata lesson library and weekly new releases.</p>
+            </div>
+        </header>
+
+        <div class="panel-grid subscription-grid">
+        {% for plan in plans %}
+        <article class="panel-tile d-flex flex-column h-100">
+            <p class="home-card__kicker">{{ plan.name }}</p>
+            <h2 class="panel-title">€{{ plan.monthly_price }} <span class="fs-6 fw-normal">/ month</span></h2>
+            <p class="panel-text">Members-only Bachata videos, weekly lesson releases, and practice log tracking.</p>
+            <ul class="mt-3 mb-4">
+                <li>Members-only Bachata videos</li>
+                <li>Weekly lesson releases</li>
+                <li>Practice log tracking</li>
+            </ul>
+            <div class="mt-auto">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'subscriptions:checkout' plan.id %}" class="btn btn-primary mt-auto">Subscribe</a>
+                <form method="post" action="{% url 'subscriptions:activate_free' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100">Subscribe for free for 30-days</button>
+                </form>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-outline-primary mt-auto">Login to Subscribe</a>
+                <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}" class="btn btn-primary w-100">Login to Activate</a>
                 {% endif %}
             </div>
+        </article>
+        {% empty %}
+        <div class="message-panel">No active plans configured yet. Add a plan in admin with a Stripe price ID.</div>
+        {% endfor %}
         </div>
     </div>
-    {% empty %}
-    <div class="col-12">
-        <div class="alert alert-warning">No active plans configured yet. Add a plan in admin with a Stripe price ID.</div>
-    </div>
-    {% endfor %}
-</div>
+</section>
 {% endblock %}
