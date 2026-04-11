@@ -2,18 +2,31 @@
 
 {% block title %}{% if is_edit %}Edit{% else %}New{% endif %} Practice Log | Bachata Club{% endblock %}
 
+{% block body_class %}practice-page{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-7">
-        <h1 class="h3 mb-3">{% if is_edit %}Edit{% else %}New{% endif %} Practice Log</h1>
-        <form method="post" class="card card-body">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <div class="d-flex gap-2">
-                <button class="btn btn-primary" type="submit">Save</button>
-                <a class="btn btn-outline-secondary" href="{% url 'practice:list' %}">Cancel</a>
+<section class="subscription-hero">
+    <div class="subscription-hero__bg" aria-hidden="true"></div>
+
+    <div class="page-shell subscription-shell subscription-shell--modern">
+        <header class="page-header subscription-header subscription-header--modern">
+            <div class="subscription-header__copy">
+                <p class="page-kicker">Practice</p>
+                <h1 class="page-title">{% if is_edit %}Edit log{% else %}New log{% endif %}</h1>
+                <p class="page-lead">Keep your notes short and easy to scan.</p>
             </div>
-        </form>
+        </header>
+
+        <div class="form-panel practice-form-panel">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="page-actions">
+                    <button class="btn btn-primary" type="submit">Save</button>
+                    <a class="btn btn-outline-secondary" href="{% url 'practice:list' %}">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}

@@ -9,40 +9,77 @@
 <section class="subscription-hero">
     <div class="subscription-hero__bg" aria-hidden="true"></div>
 
-    <div class="page-shell subscription-shell">
-        <header class="page-header subscription-header">
-            <div>
+    <div class="page-shell subscription-shell subscription-shell--modern">
+        <header class="page-header subscription-header subscription-header--modern">
+            <div class="subscription-header__copy">
                 <p class="page-kicker">Membership</p>
-                <h1 class="page-title">Membership Plans</h1>
-                <p class="page-lead">Subscribe monthly to unlock the full Bachata lesson library and weekly new releases.</p>
+                <h1 class="page-title">Choose a plan.</h1>
+                <p class="page-lead">Open the member videos and start training.</p>
+            </div>
+            <div class="subscription-header__note">
+                <p class="home-kicker">Member library</p>
+                <p class="panel-text">Simple access to the member area.</p>
             </div>
         </header>
 
-        <div class="panel-grid subscription-grid">
-        {% for plan in plans %}
-        <article class="panel-tile d-flex flex-column h-100">
-            <p class="home-card__kicker">{{ plan.name }}</p>
-            <h2 class="panel-title">€{{ plan.monthly_price }} <span class="fs-6 fw-normal">/ month</span></h2>
-            <p class="panel-text">Members-only Bachata videos, weekly lesson releases, and practice log tracking.</p>
-            <ul class="mt-3 mb-4">
-                <li>Members-only Bachata videos</li>
-                <li>Weekly lesson releases</li>
-                <li>Practice log tracking</li>
-            </ul>
-            <div class="mt-auto">
-                {% if user.is_authenticated %}
-                <form method="post" action="{% url 'subscriptions:activate_free' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary w-100">Subscribe for free for 30-days</button>
-                </form>
-                {% else %}
-                <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}" class="btn btn-primary w-100">Login to Activate</a>
-                {% endif %}
-            </div>
-        </article>
-        {% empty %}
-        <div class="message-panel">No active plans configured yet. Add a plan in admin with a Stripe price ID.</div>
-        {% endfor %}
+        <div class="subscription-layout">
+            <section class="subscription-main panel-card">
+                <div class="subscription-section-heading">
+                    <p class="page-kicker">Plans</p>
+                    <h2 class="panel-title">Select a plan</h2>
+                </div>
+
+                <div class="panel-grid subscription-grid">
+                {% for plan in plans %}
+                <article class="subscription-plan-card panel-tile d-flex flex-column h-100">
+                    <div>
+                        <p class="home-card__kicker">{{ plan.name }}</p>
+                        <h3 class="panel-title">€{{ plan.monthly_price }} <span class="fs-6 fw-normal">/ month</span></h3>
+                    </div>
+                    <ul class="subscription-feature-list mt-3 mb-4">
+                        <li>Members-only videos</li>
+                        <li>Direct access to the library</li>
+                    </ul>
+                    <div class="mt-auto">
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'subscriptions:activate_free' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary w-100">Start free 30-day access</button>
+                        </form>
+                        {% else %}
+                        <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}" class="btn btn-primary w-100">Log in to activate</a>
+                        {% endif %}
+                    </div>
+                </article>
+                {% empty %}
+                <div class="message-panel">No active plans configured yet. Add a plan in admin.</div>
+                {% endfor %}
+                </div>
+            </section>
+
+            <aside class="content-side subscription-sidebar">
+                <section class="panel-card">
+                    <p class="page-kicker">Why it works</p>
+                    <h2 class="panel-title">Simple and focused</h2>
+                </section>
+
+                <section class="panel-card">
+                    <p class="page-kicker">Best for</p>
+                    <h2 class="panel-title">Dancers who want clarity</h2>
+                    <ul class="home-list home-list--compact">
+                        <li>Quick access to videos</li>
+                        <li>Simple training sessions</li>
+                    </ul>
+                </section>
+
+                <section class="panel-card">
+                    <p class="page-kicker">Next step</p>
+                    <h2 class="panel-title">Join and open videos</h2>
+                    <div class="modern-actions mt-3">
+                        <a class="btn btn-outline-primary" href="{% url 'videos:member-library' %}">View Member Library</a>
+                    </div>
+                </section>
+            </aside>
         </div>
     </div>
 </section>

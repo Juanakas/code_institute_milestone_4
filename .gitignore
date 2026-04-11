@@ -13,6 +13,10 @@ venv/
 media/
 staticfiles/
 
+# Video files (use production storage/CDN instead)
+videos/
+*.mp4
+
 # Environment files
 .env
 .env.*

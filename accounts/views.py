@@ -12,7 +12,7 @@ def signup(request):
 		form = SignUpForm(request.POST)
 		if form.is_valid():
 			form.save()
-			messages.success(request, 'Your account is ready. Please log in.')
+			messages.success(request, 'Your account is ready. Log in to open the members library, captions, and practice tools.')
 			return redirect('login')
 	else:
 		form = SignUpForm()

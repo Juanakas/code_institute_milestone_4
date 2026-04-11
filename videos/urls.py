@@ -6,4 +6,5 @@ app_name = 'videos'
 
 urlpatterns = [
     path('', views.member_library, name='member-library'),
+    path('video/<slug:slug>/', views.lesson_video, name='lesson-video'),
 ]

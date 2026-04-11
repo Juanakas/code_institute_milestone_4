@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Advanced Bachata Poster</title>
+  <desc id="desc">Poster for the advanced Bachata partnerwork lesson.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b1b54"/>
+      <stop offset="54%" stop-color="#7b2f72"/>
+      <stop offset="100%" stop-color="#efbc69"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect x="52" y="52" width="1176" height="616" rx="36" fill="rgba(12,16,24,0.26)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="84" y="140" fill="#fff9ef" font-family="Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="4">ADVANCED</text>
+  <text x="84" y="245" fill="#fffdf7" font-family="Arial, sans-serif" font-size="72" font-weight="700">Musicality and Styling Flow</text>
+  <text x="84" y="330" fill="#fff5e2" font-family="Arial, sans-serif" font-size="58" font-weight="700">Partnerwork Combination #3</text>
+  <text x="84" y="420" fill="#fff5e2" font-family="Arial, sans-serif" font-size="32">Advanced Flow and Phrasing</text>
+  <path d="M940 220c54 0 98 44 98 98s-44 98-98 98-98-44-98-98 44-98 98-98Zm0 44c-30 0-54 24-54 54s24 54 54 54 54-24 54-54-24-54-54-54Z" fill="rgba(255,255,255,0.2)"/>
+</svg>

@@ -1,7 +1,6 @@
-django
-stripe
-dj-database-url
-gunicorn
-whitenoise
-psycopg2-binary
-python-dotenv
+Django==6.0.2
+dj-database-url==3.1.2
+gunicorn==25.1.0
+whitenoise==6.12.0
+psycopg2-binary==2.9.11
+python-dotenv==1.2.1

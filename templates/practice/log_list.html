@@ -2,38 +2,58 @@
 
 {% block title %}Practice Logs | Bachata Club{% endblock %}
 
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Your Practice Logs</h1>
-    <a href="{% url 'practice:create' %}" class="btn btn-primary">Add New Log</a>
-</div>
+{% block body_class %}practice-page{% endblock %}
 
-<div class="card">
-    <div class="table-responsive">
-        <table class="table table-striped mb-0">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Minutes</th>
-                    <th>Video</th>
-                    <th>Notes</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for log in logs %}
-                <tr>
-                    <td>{{ log.practiced_on }}</td>
-                    <td>{{ log.minutes }}</td>
-                    <td>{{ log.video|default:'-' }}</td>
-                    <td>{{ log.notes|truncatechars:70 }}</td>
-                    <td><a href="{% url 'practice:edit' log.id %}">Edit</a></td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="5" class="text-center py-4">No practice logs yet.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+{% block content %}
+<section class="subscription-hero">
+    <div class="subscription-hero__bg" aria-hidden="true"></div>
+
+    <div class="page-shell subscription-shell subscription-shell--modern">
+        <header class="page-header subscription-header subscription-header--modern">
+            <div class="subscription-header__copy">
+                <p class="page-kicker">Practice</p>
+                <h1 class="page-title">Practice logs</h1>
+                <p class="page-lead">Track a session in one place.</p>
+            </div>
+            <div class="subscription-header__note">
+                <p class="home-kicker">Quick access</p>
+                <p class="panel-text">Keep one short note for each session.</p>
+            </div>
+        </header>
+
+        <div class="panel-card practice-list-panel">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <p class="panel-text mb-0">Recent entries</p>
+                <a href="{% url 'practice:create' %}" class="btn btn-primary">Add log</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Minutes</th>
+                            <th>Video</th>
+                            <th>Notes</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.practiced_on }}</td>
+                            <td>{{ log.minutes }}</td>
+                            <td>{{ log.video|default:'-' }}</td>
+                            <td>{{ log.notes|truncatechars:70 }}</td>
+                            <td><a href="{% url 'practice:edit' log.id %}">Edit</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-4">No practice logs yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}

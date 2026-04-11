@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Intermediate Bachata Poster</title>
+  <desc id="desc">Poster for the intermediate Bachata partnerwork lesson.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1f34"/>
+      <stop offset="58%" stop-color="#184a73"/>
+      <stop offset="100%" stop-color="#efbc69"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect x="52" y="52" width="1176" height="616" rx="36" fill="rgba(12,16,24,0.26)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="84" y="140" fill="#fff9ef" font-family="Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="4">INTERMEDIATE</text>
+  <text x="84" y="245" fill="#fffdf7" font-family="Arial, sans-serif" font-size="72" font-weight="700">Partner Turns and Timing</text>
+  <text x="84" y="330" fill="#fff5e2" font-family="Arial, sans-serif" font-size="58" font-weight="700">Partnerwork Combination #2</text>
+  <text x="84" y="420" fill="#fff5e2" font-family="Arial, sans-serif" font-size="32">Timing Drill and Transitions</text>
+  <path d="M935 228h170v56H935z" fill="rgba(255,255,255,0.16)"/>
+  <path d="M920 310h200v56H920z" fill="rgba(255,255,255,0.22)"/>
+  <path d="M905 392h230v56H905z" fill="rgba(255,255,255,0.3)"/>
+</svg>

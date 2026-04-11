@@ -9,52 +9,82 @@
 <section class="subscription-hero">
     <div class="subscription-hero__bg" aria-hidden="true"></div>
 
-    <div class="page-shell subscription-shell content-columns">
+    <div class="page-shell subscription-shell subscription-shell--modern content-columns">
         <section class="content-column">
-            <header class="page-header subscription-header">
-                <div>
+            <header class="page-header subscription-header subscription-header--modern">
+                <div class="subscription-header__copy">
                     <p class="page-kicker">Account</p>
-                    <h1 class="page-title">Your Subscription Status</h1>
-                    <p class="page-lead">Check your access and jump back into the member library when you are ready.</p>
+                    <h1 class="page-title">Your access.</h1>
+                    <p class="page-lead">See your status and return to the member videos.</p>
+                </div>
+                <div class="subscription-header__note">
+                    <p class="home-kicker">Current state</p>
+                    <p class="panel-text">Keep your access visible at a glance.</p>
                 </div>
             </header>
 
-            {% if membership %}
-            <div class="status-panel">
-                <span class="status-pill">{{ membership.get_status_display }}</span>
-                {% if membership.has_access %}
-                <div class="alert alert-info mt-3 mb-3">
-                    <strong>Free trial:</strong> {{ membership.days_remaining }} day{{ membership.days_remaining|pluralize }} remaining
-                </div>
-                {% endif %}
-                <p class="page-lead mt-3 mb-3">Current period ends: {{ membership.current_period_end|default:"Not available yet" }}</p>
-                <div class="modern-actions">
-                    {% if membership.has_access %}
-                        <a class="btn btn-success" href="{% url 'videos:member-library' %}">Open Member Videos</a>
+            <section class="subscription-status-grid">
+                <div class="status-panel subscription-status-card">
+                    {% if membership %}
+                    <div class="subscription-status-card__top">
+                        <span class="status-pill">{{ membership.get_status_display }}</span>
+                        {% if membership.has_access %}
+                            <span class="subscription-status-card__badge">Active</span>
+                        {% else %}
+                            <span class="subscription-status-card__badge subscription-status-card__badge--muted">Locked</span>
+                        {% endif %}
+                    </div>
+
+                    <h2 class="panel-title mt-3">{{ membership.days_remaining }} day{{ membership.days_remaining|pluralize }} remaining</h2>
+                    <p class="panel-text">Current period ends: {{ membership.current_period_end|default:"Not available yet" }}</p>
+
+                    <div class="subscription-meter" aria-hidden="true">
+                        <div class="subscription-meter__fill" style="width: {% if membership.has_access %}82{% else %}18{% endif %}%"></div>
+                    </div>
+
+                    <div class="modern-actions mt-3">
+                        {% if membership.has_access %}
+                            <a class="btn btn-success" href="{% url 'videos:member-library' %}">Open Member Library</a>
+                        {% else %}
+                            <form method="post" action="{% url 'subscriptions:activate_free' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Start free 30-day access</button>
+                            </form>
+                        {% endif %}
+                    </div>
                     {% else %}
-                        <form method="post" action="{% url 'subscriptions:activate_free' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">Subscribe for free for 30-days</button>
-                        </form>
+                    <h2 class="panel-title">No subscription record yet</h2>
+                    <p class="panel-text">Create access first, then the member videos will unlock here.</p>
+                    <form method="post" action="{% url 'subscriptions:activate_free' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Start free 30-day access</button>
+                    </form>
                     {% endif %}
                 </div>
-            </div>
-            {% else %}
-            <div class="message-panel">
-                <p class="subtle-note mb-3">No subscription record found yet.</p>
-                <form method="post" action="{% url 'subscriptions:activate_free' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Subscribe for free for 30-days</button>
-                </form>
-            </div>
-            {% endif %}
+
+                <div class="panel-card subscription-next-card">
+                    <p class="page-kicker">Recommended next</p>
+                    <h2 class="panel-title">Return to the library</h2>
+                    <div class="modern-actions mt-3">
+                        <a class="btn btn-outline-primary" href="{% url 'videos:member-library' %}">Open videos</a>
+                    </div>
+                </div>
+            </section>
         </section>
 
-        <aside class="content-side">
+        <aside class="content-side subscription-sidebar">
             <div class="panel-card">
                 <p class="page-kicker">Overview</p>
-                <h2 class="panel-title">Stay on track</h2>
-                <p class="panel-text">Your subscription unlocks structured Bachata progress, practice logs, and the member video library.</p>
+                <h2 class="panel-title">What access includes</h2>
+                <ul class="home-list home-list--compact">
+                    <li>Members-only video lessons</li>
+                    <li>Library access</li>
+                </ul>
+            </div>
+
+            <div class="panel-card">
+                <p class="page-kicker">Account tip</p>
+                <h2 class="panel-title">Keep it simple</h2>
             </div>
         </aside>
     </div>

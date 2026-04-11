@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Bachata Basics Poster</title>
+  <desc id="desc">Poster for the beginner Bachata partnerwork lesson.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8a2e2e"/>
+      <stop offset="52%" stop-color="#c94040"/>
+      <stop offset="100%" stop-color="#efbc69"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect x="52" y="52" width="1176" height="616" rx="36" fill="rgba(12,16,24,0.28)" stroke="rgba(255,255,255,0.34)"/>
+  <text x="84" y="140" fill="#fff9ef" font-family="Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="4">BEGINNER</text>
+  <text x="84" y="245" fill="#fffdf7" font-family="Arial, sans-serif" font-size="72" font-weight="700">Frame and Connection</text>
+  <text x="84" y="330" fill="#fff5e2" font-family="Arial, sans-serif" font-size="58" font-weight="700">Partnerwork Combination #1</text>
+  <text x="84" y="420" fill="#fff5e2" font-family="Arial, sans-serif" font-size="32">Bachata Basics</text>
+  <circle cx="1040" cy="360" r="140" fill="rgba(255,255,255,0.14)"/>
+  <circle cx="1040" cy="360" r="92" fill="rgba(255,255,255,0.22)"/>
+  <path d="M1000 360c40-72 80-72 120 0-40 72-80 72-120 0Z" fill="rgba(255,255,255,0.8)"/>
+</svg>

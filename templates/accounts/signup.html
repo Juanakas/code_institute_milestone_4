@@ -1,17 +1,36 @@
 {% extends 'base.html' %}
 
 {% block title %}Create Account | Bachata Club{% endblock %}
+{% block body_class %}signup-page{% endblock %}
+{% block main_class %}container py-4 signup-main{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <h1 class="h3 mb-3">Create your account</h1>
-        <form method="post" class="card card-body">
+<div class="row g-4 align-items-start justify-content-center signup-shell">
+    <div class="col-lg-6">
+        <div class="page-header mb-4 signup-header">
+            <div>
+                <p class="page-kicker">Join the club</p>
+                <h1 class="page-title">Create your account</h1>
+                <p class="page-lead">Get access to the member videos and the library in one place.</p>
+            </div>
+        </div>
+        <form method="post" class="card card-body form-panel">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
-        <p class="mt-3">Already have an account? <a href="{% url 'login' %}">Log in</a>.</p>
+        <p class="mt-3 signup-login-note">Already have an account? <a href="{% url 'login' %}">Log in</a>.</p>
+    </div>
+    <div class="col-lg-4">
+        <div class="panel-card signup-benefits">
+            <p class="page-kicker">What you get</p>
+            <h2 class="panel-title">A focused member area</h2>
+            <ul>
+                <li>Members-only video lessons.</li>
+                <li>Simple access to the library.</li>
+                <li>Easy training from one place.</li>
+            </ul>
+        </div>
     </div>
 </div>
 {% endblock %}
