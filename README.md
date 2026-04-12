@@ -219,6 +219,34 @@ Latest result in development:
 | Safari | iOS (target) | 390x844 | Pass |
 | Chrome Mobile | Android (target) | 412x915 | Pass |
 
+---
+
+# 6. Video Hosting (Production)
+
+For long-term production stability, avoid storing large MP4 files in git/slug builds.
+
+The project supports external video hosting through an environment variable:
+
+- `VIDEO_BASE_URL`
+
+When `VIDEO_BASE_URL` is set, member video players use direct URLs in this format:
+
+- `{VIDEO_BASE_URL}/{filename}`
+
+Example Heroku config:
+
+```powershell
+heroku config:set VIDEO_BASE_URL=https://your-cdn-or-bucket.example.com/videos --app juanakas-bachata
+```
+
+Expected hosted file names:
+
+- `20250819_beginner.mp4`
+- `20251023_intermediate.mp4`
+- `20251108_advanced.mp4`
+
+After verifying playback from the external host, you can stop shipping MP4 binaries in app deployments.
+
 ### Accessibility Testing
 
 Accessibility practices implemented:

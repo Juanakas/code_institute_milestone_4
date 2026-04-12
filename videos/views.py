@@ -81,6 +81,13 @@ VIDEO_LIBRARY = [
 ]
 
 VIDEO_LIBRARY_BY_SLUG = {lesson['slug']: lesson for lesson in VIDEO_LIBRARY}
+VIDEO_BASE_URL = os.getenv('VIDEO_BASE_URL', '').strip().rstrip('/')
+
+
+def _video_stream_url(slug, filename):
+	if VIDEO_BASE_URL:
+		return f'{VIDEO_BASE_URL}/{filename}'
+	return reverse('videos:lesson-video', kwargs={'slug': slug})
 
 
 def build_video_lessons(selected_level=''):
@@ -94,7 +101,7 @@ def build_video_lessons(selected_level=''):
 		lessons.append({
 			**lesson,
 			'level_display': level_labels.get(lesson['level'], lesson['level'].title()),
-			'video_url': reverse('videos:lesson-video', kwargs={'slug': lesson['slug']}),
+			'video_url': _video_stream_url(lesson['slug'], lesson['filename']),
 			'poster_url': static(lesson['poster']),
 			'captions_url': static(lesson['captions']),
 			'is_released': lesson['release_date'] <= timezone.now().date(),
