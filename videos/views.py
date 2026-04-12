@@ -1,3 +1,4 @@
+import os
 from datetime import date
 from pathlib import Path
 
@@ -82,9 +83,17 @@ VIDEO_LIBRARY = [
 
 VIDEO_LIBRARY_BY_SLUG = {lesson['slug']: lesson for lesson in VIDEO_LIBRARY}
 VIDEO_BASE_URL = os.getenv('VIDEO_BASE_URL', '').strip().rstrip('/')
+EXTERNAL_VIDEO_URLS = {
+	'beginner-partnerwork-combination-1': os.getenv('VIDEO_URL_BEGINNER', '').strip(),
+	'intermediate-partnerwork-combination-2': os.getenv('VIDEO_URL_INTERMEDIATE', '').strip(),
+	'advanced-partnerwork-combination-3': os.getenv('VIDEO_URL_ADVANCED', '').strip(),
+}
 
 
 def _video_stream_url(slug, filename):
+	external_url = EXTERNAL_VIDEO_URLS.get(slug, '')
+	if external_url:
+		return external_url
 	if VIDEO_BASE_URL:
 		return f'{VIDEO_BASE_URL}/{filename}'
 	return reverse('videos:lesson-video', kwargs={'slug': slug})
