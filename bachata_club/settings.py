@@ -12,11 +12,37 @@ load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-key-change-for-production")
 DEBUG = os.getenv("DEBUG", "1") == "1"
-ALLOWED_HOSTS = [
-    host.strip()
+
+
+def _normalize_host(raw_host):
+    host = raw_host.strip().lower()
+    if not host:
+        return ''
+
+    if host.startswith('http://'):
+        host = host[len('http://'):]
+    elif host.startswith('https://'):
+        host = host[len('https://'):]
+
+    host = host.split('/')[0].split(':')[0]
+    return host
+
+
+_env_allowed_hosts = [
+    _normalize_host(host)
     for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,testserver").split(",")
-    if host.strip()
 ]
+
+ALLOWED_HOSTS = [
+    '.herokuapp.com',
+    *[host for host in _env_allowed_hosts if host],
+]
+
+heroku_app_name = os.getenv('HEROKU_APP_NAME', '').strip().lower()
+if heroku_app_name:
+    ALLOWED_HOSTS.append(f'{heroku_app_name}.herokuapp.com')
+
+ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
 
 
 # Application definition
