@@ -3,7 +3,7 @@
 A Django full-stack membership platform for Bachata dancers. Users can create an account, activate a free 30-day trial, and access members-only video lessons.
 
 **Live Deployment:**
-Add your live URL here
+(https://juanakas-bachata-0d07eb997c60.herokuapp.com/home/)
 
 **GitHub Repository:**
 https://github.com/Juanakas/code_institute_milestone_4
