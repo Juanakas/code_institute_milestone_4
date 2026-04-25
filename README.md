@@ -241,9 +241,9 @@ heroku config:set VIDEO_BASE_URL=https://your-cdn-or-bucket.example.com/videos -
 
 Expected hosted file names:
 
-- `20250819_beginner.mp4`
-- `20251023_intermediate.mp4`
-- `20251108_advanced.mp4`
+- `20251023_beginner.mp4`
+- `20250819_intermediate.mp4`
+- `20260422_advanced.mp4`
 
 After verifying playback from the external host, you can stop shipping MP4 binaries in app deployments.
 

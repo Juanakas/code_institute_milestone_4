@@ -1,10 +1,11 @@
 import os
+import re
 from datetime import date
 from pathlib import Path
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponse, StreamingHttpResponse
 from django.urls import reverse
 from django.templatetags.static import static
 from django.shortcuts import render
@@ -21,8 +22,8 @@ VIDEO_LIBRARY = [
 		'title': 'Bachata Basics: Frame and Connection for Partnerwork Combination #1',
 		'description': 'Beginner-friendly partnerwork focused on frame, connection, and clear lead-and-follow basics.',
 		'level': VideoLesson.BEGINNER,
-		'release_date': date(2025, 8, 19),
-		'filename': '20250819_beginner.mp4',
+		'release_date': date(2025, 10, 23),
+		'filename': '20251023_beginner.mp4',
 		'poster': 'images/video-posters/20250819_beginner.svg',
 		'captions': 'vtt/20250819_beginner.vtt',
 		'duration': '12 min',
@@ -42,8 +43,8 @@ VIDEO_LIBRARY = [
 		'title': 'Partner Turns and Timing Drill for Partnerwork Combination #2',
 		'description': 'Intermediate practice for cleaner turns, timing control, and smoother partner transitions.',
 		'level': VideoLesson.INTERMEDIATE,
-		'release_date': date(2025, 10, 23),
-		'filename': '20251023_intermediate.mp4',
+		'release_date': date(2025, 8, 19),
+		'filename': '20250819_intermediate.mp4',
 		'poster': 'images/video-posters/20251023_intermediate.svg',
 		'captions': 'vtt/20251023_intermediate.vtt',
 		'duration': '14 min',
@@ -63,8 +64,8 @@ VIDEO_LIBRARY = [
 		'title': 'Musicality and Styling Flow for Partnerwork Combination #3',
 		'description': 'Advanced partnerwork that adds musicality, styling, and flow through the combination.',
 		'level': VideoLesson.ADVANCED,
-		'release_date': date(2025, 11, 8),
-		'filename': '20251108_advanced.mp4',
+		'release_date': date(2026, 4, 22),
+		'filename': '20260422_advanced.mp4',
 		'poster': 'images/video-posters/20251108_advanced.svg',
 		'captions': 'vtt/20251108_advanced.vtt',
 		'duration': '16 min',
@@ -97,6 +98,55 @@ def _video_stream_url(slug, filename):
 	if VIDEO_BASE_URL:
 		return f'{VIDEO_BASE_URL}/{filename}'
 	return reverse('videos:lesson-video', kwargs={'slug': slug})
+
+
+def _stream_video_range(file_handle, length, chunk_size=8192):
+	remaining = length
+	try:
+		while remaining > 0:
+			chunk = file_handle.read(min(chunk_size, remaining))
+			if not chunk:
+				break
+			remaining -= len(chunk)
+			yield chunk
+	finally:
+		file_handle.close()
+
+
+def _video_response(request, video_path):
+	video_size = video_path.stat().st_size
+	range_header = request.META.get('HTTP_RANGE', '').strip()
+	if range_header:
+		match = re.match(r'bytes=(\d*)-(\d*)', range_header)
+		if match:
+			start_text, end_text = match.groups()
+			start = int(start_text) if start_text else 0
+			end = int(end_text) if end_text else video_size - 1
+			end = min(end, video_size - 1)
+
+			if start >= video_size:
+				response = HttpResponse(status=416)
+				response['Content-Range'] = f'bytes */{video_size}'
+				response['Accept-Ranges'] = 'bytes'
+				return response
+
+			length = end - start + 1
+			video_handle = video_path.open('rb')
+			video_handle.seek(start)
+			response = StreamingHttpResponse(
+				_stream_video_range(video_handle, length),
+				status=206,
+				content_type='video/mp4',
+			)
+			response['Content-Length'] = str(length)
+			response['Content-Range'] = f'bytes {start}-{end}/{video_size}'
+			response['Accept-Ranges'] = 'bytes'
+			return response
+
+	response = FileResponse(video_path.open('rb'), content_type='video/mp4')
+	response['Content-Length'] = str(video_size)
+	response['Accept-Ranges'] = 'bytes'
+	return response
 
 
 def build_video_lessons(selected_level=''):
@@ -157,4 +207,4 @@ def lesson_video(request, slug):
 	if not video_path.exists():
 		raise Http404('Video file not found')
 
-	return FileResponse(video_path.open('rb'), content_type='video/mp4')
+	return _video_response(request, video_path)

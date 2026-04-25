@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from subscriptions.models import Membership
+from videos.views import build_video_lessons
 
 
 class MemberLibraryTests(TestCase):
@@ -28,11 +29,31 @@ class MemberLibraryTests(TestCase):
 		self.assertContains(response, 'Partner Turns and Timing Drill for Partnerwork Combination #2')
 		self.assertContains(response, 'Musicality and Styling Flow for Partnerwork Combination #3')
 		self.assertContains(response, '<video', html=False)
+		self.assertNotContains(response, 'data-video-toggle', html=False)
+		self.assertNotContains(response, 'Play lesson')
 		self.assertContains(response, 'track kind="captions"', html=False)
 		self.assertContains(response, 'controlslist="nodownload noplaybackrate"', html=False)
 
-	def test_lesson_video_endpoint_serves_mp4(self):
-		response = self.client.get(reverse('videos:lesson-video', kwargs={'slug': 'beginner-partnerwork-combination-1'}))
+	def test_video_library_maps_new_files_to_levels(self):
+		lessons = build_video_lessons()
 
-		self.assertEqual(response.status_code, 200)
-		self.assertEqual(response['Content-Type'], 'video/mp4')
+		self.assertEqual([lesson['level'] for lesson in lessons], ['beginner', 'intermediate', 'advanced'])
+		self.assertEqual([lesson['filename'] for lesson in lessons], [
+			'20251023_beginner.mp4',
+			'20250819_intermediate.mp4',
+			'20260422_advanced.mp4',
+		])
+
+	def test_lesson_video_endpoint_serves_each_new_video(self):
+		for slug in [
+			'beginner-partnerwork-combination-1',
+			'intermediate-partnerwork-combination-2',
+			'advanced-partnerwork-combination-3',
+		]:
+			with self.subTest(slug=slug):
+				response = self.client.get(reverse('videos:lesson-video', kwargs={'slug': slug}))
+
+				self.assertEqual(response.status_code, 200)
+				self.assertEqual(response['Content-Type'], 'video/mp4')
+				self.assertIn('Content-Length', response)
+				self.assertGreater(int(response['Content-Length']), 1000000)
