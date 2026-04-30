@@ -1,12 +1,22 @@
 import datetime
 
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from subscriptions.models import Membership
 
 from .forms import SignUpForm
+
+
+class MemberLoginView(LoginView):
+	template_name = 'registration/login.html'
+
+	def get_success_url(self):
+		if self.request.user.is_staff:
+			return '/admin/'
+		return super().get_success_url()
 
 
 def signup(request):
