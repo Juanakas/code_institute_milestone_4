@@ -1,2 +1,2 @@
-release: python manage.py collectstatic --noinput
-web: gunicorn bachata_club.wsgi
+release: python manage.py migrate && python manage.py collectstatic --noinput
+web: gunicorn --no-sendfile bachata_club.wsgi
