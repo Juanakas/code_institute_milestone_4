@@ -14,8 +14,9 @@ media/
 staticfiles/
 
 # Video files (use production storage/CDN instead)
-videos/
+# Keep MP4 files ignored globally, but allow MP4s committed in the `videos/` folder
 *.mp4
+!videos/*.mp4
 
 # Environment files
 .env
