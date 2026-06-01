@@ -1,9 +1,9 @@
 ﻿# Bachata Club - Membership Training Platform
 
-A Django full-stack membership platform for Bachata dancers. Users can create an account, activate a free 30-day trial, and access members-only video lessons.
+A Django full-stack membership platform for Bachata dancers. Users can create an account, subscribe through Stripe checkout, and access members-only video lessons.
 
 **Live Deployment:**
-(https://juanakas-bachata-0d07eb997c60.herokuapp.com/home/)
+[https://juanakas-bachata-0d07eb997c60.herokuapp.com/home/](https://juanakas-bachata-0d07eb997c60.herokuapp.com/home/)
 
 **GitHub Repository:**
 https://github.com/Juanakas/code_institute_milestone_4
@@ -13,20 +13,22 @@ https://github.com/Juanakas/code_institute_milestone_4
 # 1. UX
 
 **Project Overview:**
-Bachata Club is designed for dancers who want a clear, focused learning flow. Visitors can understand the value of the platform from the homepage, create an account, activate a free trial, and access protected lesson content.
+Bachata Club is designed for dancers who want a clear, focused learning flow. Visitors can understand the value of the platform from the homepage, create an account, subscribe, and access protected lesson content.
 
 ### Features Overview
 
 - **Homepage Experience**: Brand-led hero section with clear calls to action.
 - **Account System**: Sign up, login, logout via Django authentication.
-- **Free Trial Membership**: Logged-in users can activate a 30-day free membership.
+- **Stripe Subscription Checkout**: Logged-in users can start a recurring monthly subscription.
 - **Members Library**: Protected streaming of local video lessons.
 - **Membership Status**: Users can view current membership status and days remaining.
+- **Practice Log CRUD**: Members can create, read, update, and delete their own practice logs from the frontend.
+- **Demo Payment Confirmation Flow**: In debug fallback checkout, valid form submission activates membership, shows a popup-style success message, and redirects users to the members area.
 - **Responsive Interface**: Layout and controls adapted for mobile, tablet, desktop, and ultra-wide displays.
 
 ### User Experience Highlights
 
-- Clear path from public homepage to account creation and trial activation.
+- Clear path from public homepage to account creation and subscription checkout.
 - Protected routes ensure member content is only accessible to active memberships.
 - Focused member area with embedded videos and caption tracks.
 - Consistent visual language across all key pages.
@@ -38,6 +40,9 @@ Bachata Club is designed for dancers who want a clear, focused learning flow. Vi
 
 #### Pricing Page
 ![Pricing Page](screenshots/pricing_page.png)
+
+#### Checkout Page
+![Checkout Page](screenshots/checkout.png)
 
 #### Sign Up Page
 ![Sign Up Page](screenshots/sign_up_page.png)
@@ -62,7 +67,7 @@ Main templates used in this project:
 - **templates/accounts/signup.html**: Account registration page.
 - **templates/registration/login.html**: Login page.
 - **templates/registration/logged_out.html**: Logout confirmation page.
-- **templates/subscriptions/pricing.html**: Membership/trial activation page.
+- **templates/subscriptions/pricing.html**: Membership pricing and subscription page.
 - **templates/subscriptions/status.html**: Membership status dashboard.
 - **templates/videos/member_library.html**: Protected lesson library with video players.
 
@@ -169,18 +174,63 @@ Current note:
 Run all automated tests:
 
 ```powershell
-python manage.py test home subscriptions videos
+python manage.py test
 ```
 
 Current automated suite includes:
 
+- `accounts/tests.py`
+- `checkout/tests.py`
 - `home/tests.py`
+- `practice/tests.py`
 - `subscriptions/tests.py`
 - `videos/tests.py`
 
 Latest result in development:
 
-- 7 tests executed, all passing.
+- 29 tests executed, all passing.
+
+### Recent Updates (LO3-LO5)
+
+- Added anonymous-only auth page behavior for logged-in users (`signup` redirect and `redirect_authenticated_user` on login).
+- Hardened direct URL access around protected routes and checkout debug-only activation behavior.
+- Added realistic academic checkout form with required billing/card inputs and server-side validation.
+- Added purchase feedback system (rating + comments) after successful activation.
+- Updated debug checkout completion flow to activate membership, show popup success messaging, and redirect directly to members area.
+- Aligned deployment and security documentation with current Procfile and environment-variable usage.
+
+### LO3 Authentication & Permissions Evidence (3.1, 3.2, 3.3)
+
+- **3.1 Authentication mechanism with clear purpose**:
+	Users can register and log in via Django auth pages to access protected member features (members library, subscription status, practice area).
+	Evidence: `accounts/views.py`, `accounts/forms.py`, `templates/registration/login.html`, `templates/accounts/signup.html`.
+
+- **3.2 Login and registration only for anonymous users**:
+	Signup view redirects authenticated users away, and login view uses `redirect_authenticated_user = True`.
+	Evidence: `accounts/views.py` and automated tests in `accounts/tests.py`.
+
+- **3.3 Prevent non-admin users from direct data-store access via URL**:
+	Protected routes use `@login_required`, `@subscription_required`, and object-level filtering (`user=request.user`) so users cannot change other users' records by typing URLs directly.
+	Checkout dev-only activation endpoint is blocked outside debug mode.
+	Evidence: `practice/views.py`, `subscriptions/decorators.py`, `checkout/views.py`, with tests in `practice/tests.py` and `checkout/tests.py`.
+
+### LO4 E-Commerce & Purchase Feedback Evidence (4.1, 4.2)
+
+- **4.1 Payment mechanism implemented with Stripe-oriented checkout flow**:
+	The app uses Stripe Checkout when Stripe credentials are configured. For academic demonstration in debug mode, a realistic checkout form is presented with required billing and payment inputs, then subscription is activated without storing or charging card data.
+	Evidence: `subscriptions/views.py`, `checkout/views.py`, `checkout/forms.py`, `templates/checkout/checkout_preview.html`.
+
+- **4.2 Feedback system based on completed purchase**:
+	After activation, users can submit checkout experience feedback (rating + comments) on the success page.
+	Feedback entries are persisted and visible as recent feedback history.
+	Evidence: `checkout/models.py`, `checkout/forms.py`, `checkout/views.py`, `templates/checkout/success.html`, `checkout/tests.py`.
+
+### LO5 Version Control & Deployment Evidence (5.1-5.6)
+
+- Deployment configuration is documented and aligned with the current production process (`Procfile`, environment variables, and deploy checklist).
+- Security-related deployment settings are environment-driven (`DEBUG=0`, strong `SECRET_KEY`, HTTPS/security env vars).
+- README includes setup, deployment, and test execution guidance for local and cloud-hosted runs.
+- Development updates are documented incrementally in this README under testing evidence and recent updates.
 
 ### Manual Testing
 
@@ -189,7 +239,10 @@ Latest result in development:
 | Homepage load | Open `/home/` | Hero and CTA render correctly | Pass |
 | Signup flow | Open `/accounts/signup/` and submit valid data | Account created successfully | Pass |
 | Login flow | Open `/accounts/login/` with valid credentials | User is logged in | Pass |
-| Trial activation | Click free trial activation on pricing page | Membership activated for 30 days | Pass |
+| Subscription checkout | Click subscribe on pricing page and complete checkout | Membership activated after successful checkout/webhook sync | Pass |
+| Demo payment form | Open debug checkout fallback and submit with missing fields | Validation errors shown, activation blocked | Pass |
+| Demo payment submit | Submit valid demo checkout form | Membership activated, popup success message shown, redirected to members area | Pass |
+| Purchase feedback | Submit rating/comment after activation | Feedback saved and shown in recent feedback list | Pass |
 | Membership status | Open `/subscriptions/status/` after activation | Days remaining and status shown | Pass |
 | Members route protection | Access `/members/` without active membership | Redirect to pricing with warning | Pass |
 | Members video rendering | Open `/members/` as active member | Embedded video players render | Pass |
@@ -205,7 +258,7 @@ Latest result in development:
 | 1 | Homepage required unnecessary scroll on desktop | Medium | Reduced page sections and tightened hero layout | Fixed |
 | 2 | Inconsistent styling across auth/subscription pages | Medium | Unified shared page/panel typography and theme classes | Fixed |
 | 3 | Members page controls included removed features | Medium | Simplified template and JS to current behavior only | Fixed |
-| 4 | Stripe/payment code remained though free trial is used | High | Removed Stripe dependencies, routes, views, docs, templates | Fixed |
+| 4 | Payment flow previously incomplete for assessment needs | High | Added Stripe checkout session flow, webhook sync, and subscription status pages | Fixed |
 | 5 | Legacy JS contained unused logic from old UI | Medium | Refactored `member-library.js` to active features only | Fixed |
 | 6 | Mobile edge cases (short viewport/notch) | Medium | Added responsive safety layer and dynamic viewport/safe-area rules | Fixed |
 
@@ -309,7 +362,7 @@ Performance-oriented choices in the project:
 
 ---
 
-# 6. Deployment
+# 7. Deployment
 
 ### Version Control with Git
 
@@ -332,18 +385,23 @@ Prerequisites:
 Required environment variables:
 
 ```text
-SECRET_KEY=your-secret-key
+SECRET_KEY=use-a-long-random-secret-key-min-50-chars
 DEBUG=0
 ALLOWED_HOSTS=your-app.herokuapp.com,your-domain.com
 CSRF_TRUSTED_ORIGINS=https://your-app.herokuapp.com,https://your-domain.com
 DATABASE_URL=postgresql://...
+SECURE_SSL_REDIRECT=1
+STRIPE_PUBLIC_KEY=pk_live_or_pk_test
+STRIPE_SECRET_KEY=sk_live_or_sk_test
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SUBSCRIPTION_PRICE_ID=price_...
 ```
 
 Procfile setup in project:
 
 ```text
-release: python manage.py collectstatic --noinput
-web: gunicorn bachata_club.wsgi
+release: python manage.py migrate && python manage.py collectstatic --noinput
+web: gunicorn --no-sendfile bachata_club.wsgi
 ```
 
 Deploy checklist:
@@ -352,11 +410,11 @@ Deploy checklist:
 2. `python manage.py collectstatic --noinput`
 3. `python manage.py check --deploy`
 4. Deploy to Heroku
-5. Verify login, trial activation, members access, and static assets
+5. Verify login, subscription checkout, members access, and static assets
 
 ---
 
-# 7. User Stories
+# 8. User Stories
 
 ### User Story Analysis
 
@@ -369,26 +427,26 @@ Features satisfying this:
 
 - Clear homepage branding and CTA
 - Direct path to signup and pricing
-- Concise explanation of free 30-day trial
+- Concise explanation of monthly subscription value
 
 #### User Story 2: Member Wants Protected Lessons
 **As a** registered user  
-**I want to** access members-only videos after activating trial  
+**I want to** access members-only videos after activating my subscription  
 **So that** I can train with structured content
 
 Features satisfying this:
 
-- Trial activation flow
+- Subscription checkout flow
 - Membership-gated members route
 - Protected lesson video endpoint
 
 ---
 
-# 8. Purpose and Value
+# 9. Purpose and Value
 
 **For learners:**
 
-- Fast onboarding with account + free trial.
+- Fast onboarding with account + subscription checkout.
 - Access to protected Bachata lesson videos.
 
 **For platform management:**
@@ -399,11 +457,11 @@ Features satisfying this:
 
 ---
 
-# 9. Features
+# 10. Features
 
 - Multi-app Django architecture (`home`, `accounts`, `videos`, `subscriptions`)
 - Authentication and protected member access
-- 30-day free trial activation workflow
+- Stripe subscription checkout workflow with dev fallback form
 - Members-only embedded video library and protected stream endpoint
 - Subscription status dashboard
 - Responsive interface tuned for phone/tablet/desktop/ultra-wide
@@ -411,7 +469,7 @@ Features satisfying this:
 
 ---
 
-# 10. Tech Stack
+# 11. Tech Stack
 
 - **Backend:** Python, Django
 - **Database:** SQLite (development), PostgreSQL-ready via `DATABASE_URL`
@@ -420,7 +478,7 @@ Features satisfying this:
 
 ---
 
-# 11. Setup
+# 12. Setup
 
 ### 1) Create and activate virtual environment
 
@@ -465,7 +523,7 @@ Open:
 
 ---
 
-# 12. Database Schema
+# 13. Database Schema
 
 ## subscriptions.SubscriptionPlan
 
@@ -481,6 +539,13 @@ Open:
 - `updated_at` (DateTime)
 - Computed properties: `has_access`, `days_remaining`
 
+## checkout.CheckoutFeedback
+
+- `user` (ForeignKey to `auth.User`)
+- `rating` (1-5 choice)
+- `comments` (optional text)
+- `created_at` (DateTime)
+
 ## videos.VideoLesson
 
 - `title`, `slug`, `description`
@@ -491,7 +556,7 @@ Open:
 
 ---
 
-# 13. URLs
+# 14. URLs
 
 Main routes:
 
@@ -502,23 +567,26 @@ Main routes:
 - `/accounts/logout/`
 - `/subscriptions/`
 - `/subscriptions/status/`
-- `/subscriptions/activate-free/`
+- `/subscriptions/webhook/`
+- `/checkout/create/`
+- `/checkout/dev-complete/` (debug fallback flow)
+- `/checkout/success/`
 - `/members/`
 - `/members/video/<slug>/`
 - `/admin/`
 
 ---
 
-# 14. CRUD Coverage
+# 15. CRUD Coverage
 
-- **Create**: User account, free trial activation
+- **Create**: User account, subscription checkout session, checkout feedback entries
 - **Read**: Homepage, pricing, status, members library
 - **Update**: Membership/admin updates
 - **Delete**: Data management via Django admin (user-facing delete not exposed in current UI)
 
 ---
 
-# 15. Code Quality and Standards
+# 16. Code Quality and Standards
 
 **Python:**
 
@@ -541,7 +609,7 @@ Main routes:
 
 ---
 
-# 16. Security and Authentication Notes
+# 17. Security and Authentication Notes
 
 - Django auth handles signup/login/logout flows.
 - Member content protected with `login_required` and subscription access checks.
@@ -550,7 +618,7 @@ Main routes:
 
 ---
 
-# 17. Technologies Used
+# 18. Technologies Used
 
 **Backend packages (pinned):**
 
@@ -576,18 +644,22 @@ Main routes:
 
 ---
 
-# 18. Project Structure
+# 19. Project Structure
 
 ```text
 14_milestione4/
 ├── accounts/
 ├── bachata_club/
+├── checkout/
 ├── home/
+├── practice/
 ├── subscriptions/
 ├── videos/
 ├── templates/
 │   ├── accounts/
+│   ├── checkout/
 │   ├── home/
+│   ├── practice/
 │   ├── registration/
 │   ├── subscriptions/
 │   └── videos/
@@ -603,7 +675,7 @@ Main routes:
 
 ---
 
-# 19. Future Enhancements
+# 20. Future Enhancements
 
 - Member profile page
 - Lesson completion milestones
@@ -613,7 +685,7 @@ Main routes:
 
 ---
 
-# 20. Credits and Attribution
+# 21. Credits and Attribution
 
 - **Framework:** Django
 - **UI foundation:** Bootstrap 5 + custom CSS
@@ -623,13 +695,13 @@ Main routes:
 
 ---
 
-# 21. License
+# 22. License
 
 This project is created for educational purposes as part of Code Institute coursework.
 
 ---
 
-# 22. Contact
+# 23. Contact
 
 For questions, feedback, or collaboration, contact the maintainer through GitHub.
 

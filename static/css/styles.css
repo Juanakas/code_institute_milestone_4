@@ -1120,6 +1120,57 @@ body.practice-page .practice-list-panel tbody th {
     gap: 0.45rem;
 }
 
+/* Checkout preview page: enforce strong contrast for all key text/controls. */
+body.checkout-preview-page .subscription-hero .panel-card,
+body.checkout-preview-page .subscription-hero .page-header,
+body.checkout-preview-page .subscription-hero .subscription-header__note {
+    background: rgba(8, 12, 18, 0.92);
+    border-color: rgba(255, 197, 116, 0.24);
+}
+
+body.checkout-preview-page .subscription-hero .panel-card,
+body.checkout-preview-page .subscription-hero .panel-card p,
+body.checkout-preview-page .subscription-hero .panel-card li,
+body.checkout-preview-page .subscription-hero .form-label,
+body.checkout-preview-page .subscription-hero .form-check-label,
+body.checkout-preview-page .subscription-hero .panel-title,
+body.checkout-preview-page .subscription-hero .panel-text,
+body.checkout-preview-page .subscription-hero .page-title,
+body.checkout-preview-page .subscription-hero .page-lead,
+body.checkout-preview-page .subscription-hero .page-kicker,
+body.checkout-preview-page .subscription-hero .home-kicker,
+body.checkout-preview-page .subscription-hero .text-muted {
+    color: #fff8ec !important;
+}
+
+body.checkout-preview-page .subscription-hero .form-control,
+body.checkout-preview-page .subscription-hero .form-select {
+    background: #ffffff;
+    color: #121212;
+    border-color: #d9d9d9;
+}
+
+body.checkout-preview-page .subscription-hero .form-control::placeholder {
+    color: #6a6a6a;
+}
+
+body.checkout-preview-page .subscription-hero .form-control:focus,
+body.checkout-preview-page .subscription-hero .form-select:focus {
+    background: #ffffff;
+    color: #121212;
+    border-color: #f0bc69;
+    box-shadow: 0 0 0 0.2rem rgba(240, 188, 105, 0.24);
+}
+
+body.checkout-preview-page .subscription-hero .form-check-input {
+    border-color: #f0bc69;
+}
+
+body.checkout-preview-page .subscription-hero .form-check-input:checked {
+    background-color: #f0bc69;
+    border-color: #f0bc69;
+}
+
 .subscription-status-grid {
     display: grid;
     gap: 1rem;

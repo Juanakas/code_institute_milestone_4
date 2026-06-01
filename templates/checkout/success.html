@@ -8,6 +8,42 @@
     {% if membership and membership.has_access %}
         <p>Thanks — your subscription is active. You can now access the member library.</p>
         <a class="btn btn-primary" href="{% url 'videos:member-library' %}">Open Member Library</a>
+
+        <section class="panel-card mt-4">
+            <h2 class="panel-title">Checkout feedback</h2>
+            <p class="panel-text">Tell us how the purchase flow felt after completing your subscription.</p>
+
+            <form method="post" action="{% url 'checkout:success' %}">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label" for="{{ feedback_form.rating.id_for_label }}">How easy was checkout?</label>
+                    {{ feedback_form.rating }}
+                    {% for error in feedback_form.rating.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="{{ feedback_form.comments.id_for_label }}">Optional comments</label>
+                    {{ feedback_form.comments }}
+                    {% for error in feedback_form.comments.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+
+                <button class="btn btn-outline-primary" type="submit">Submit feedback</button>
+            </form>
+
+            {% if recent_feedback %}
+            <hr>
+            <h3 class="h5">Your recent feedback</h3>
+            <ul class="mb-0">
+                {% for item in recent_feedback %}
+                <li>
+                    {{ item.created_at|date:'Y-m-d H:i' }} - {{ item.get_rating_display }}
+                    {% if item.comments %}<br>{{ item.comments }}{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </section>
     {% else %}
         <p>We couldn't detect an active subscription on your account. If you used Stripe, wait a minute for the webhook to sync.</p>
         <a class="btn btn-outline-primary" href="{% url 'subscriptions:status' %}">Subscription status</a>

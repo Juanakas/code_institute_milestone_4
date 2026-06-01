@@ -1,15 +1,136 @@
 {% extends 'base.html' %}
 
 {% block title %}Checkout (dev) | Bachata Club{% endblock %}
+{% block body_class %}checkout-preview-page{% endblock %}
 
 {% block content %}
-<div class="page-shell">
-    <h1>Checkout Preview</h1>
-    <p>This is a development preview of the checkout flow. No external Stripe calls will be made.</p>
-    <p>Price: €{{ monthly_price }}</p>
-    <form method="post" action="{% url 'checkout:dev_complete_payment' %}">
-        {% csrf_token %}
-        <button class="btn btn-primary" type="submit">Complete payment (dev)</button>
-    </form>
-</div>
+<section class="subscription-hero">
+    <div class="subscription-hero__bg" aria-hidden="true"></div>
+    <div class="page-shell subscription-shell subscription-shell--modern">
+        <header class="page-header subscription-header subscription-header--modern mb-4">
+            <div class="subscription-header__copy">
+                <p class="page-kicker">Checkout</p>
+                <h1 class="page-title">Complete your subscription payment</h1>
+                <p class="page-lead">Academic demo checkout with realistic required fields and Stripe-style structure.</p>
+            </div>
+            <div class="subscription-header__note">
+                <p class="home-kicker">Total today</p>
+                <p class="panel-text fs-5 mb-0">EUR {{ monthly_price }} / month</p>
+            </div>
+        </header>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <form method="post" action="{% url 'checkout:dev_complete_payment' %}" class="panel-card form-panel" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <h2 class="panel-title mb-3">Billing details</h2>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.full_name.id_for_label }}">Full name</label>
+                            {{ form.full_name }}
+                            {% for error in form.full_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.email.id_for_label }}">Email address</label>
+                            {{ form.email }}
+                            {% for error in form.email.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.address_line_1.id_for_label }}">Address line 1</label>
+                            {{ form.address_line_1 }}
+                            {% for error in form.address_line_1.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.city.id_for_label }}">City</label>
+                            {{ form.city }}
+                            {% for error in form.city.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.postal_code.id_for_label }}">Postal code</label>
+                            {{ form.postal_code }}
+                            {% for error in form.postal_code.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.country.id_for_label }}">Country</label>
+                            {{ form.country }}
+                            {% for error in form.country.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+
+                    <h2 class="panel-title mb-3">Card details</h2>
+                    <p class="panel-text mb-2">Powered by Stripe test-mode flow style.</p>
+                    <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.cardholder_name.id_for_label }}">Name on card</label>
+                            {{ form.cardholder_name }}
+                            {% for error in form.cardholder_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.card_number.id_for_label }}">Card number</label>
+                            {{ form.card_number }}
+                            {% for error in form.card_number.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            <small class="text-muted">Use Stripe test card format, for example 4242 4242 4242 4242.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.expiry_month.id_for_label }}">Expiry month</label>
+                            {{ form.expiry_month }}
+                            {% for error in form.expiry_month.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.expiry_year.id_for_label }}">Expiry year</label>
+                            {{ form.expiry_year }}
+                            {% for error in form.expiry_year.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.cvc.id_for_label }}">CVC</label>
+                            {{ form.cvc }}
+                            {% for error in form.cvc.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        {{ form.accept_terms }}
+                        <label class="form-check-label" for="{{ form.accept_terms.id_for_label }}">
+                            This is an academic demo: submitted payment details are validated for format only and are not stored or charged.
+                        </label>
+                        {% for error in form.accept_terms.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-primary" type="submit">Pay and activate subscription</button>
+                        <a class="btn btn-outline-secondary" href="{% url 'subscriptions:pricing' %}">Cancel</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-4">
+                <aside class="panel-card">
+                    <p class="page-kicker">Order summary</p>
+                    <h2 class="panel-title">Members Area Subscription</h2>
+                    <p class="panel-text mb-2">Recurring monthly access to the member library and practice tools.</p>
+                    <hr>
+                    <p class="mb-1"><strong>Subtotal:</strong> EUR {{ monthly_price }}</p>
+                    <p class="mb-1"><strong>Tax:</strong> EUR 0.00</p>
+                    <p class="mb-0"><strong>Total due now:</strong> EUR {{ monthly_price }}</p>
+                </aside>
+            </div>
+        </div>
+    </div>
+</section>
+{% if stripe_public_key %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    // Keep Stripe loaded to mirror a real payment page setup in this academic demo.
+    Stripe("{{ stripe_public_key|escapejs }}");
+</script>
+{% endif %}
 {% endblock %}
