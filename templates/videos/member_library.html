@@ -47,6 +47,20 @@
     </div>
     {% endfor %}
 </div>
+
+<section class="panel-card mt-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <p class="page-kicker">Practice tracker</p>
+            <h2 class="panel-title">Log what you worked on</h2>
+            <p class="panel-text mb-0">Create, edit, and delete your practice notes from the frontend.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary" href="{% url 'practice:create' %}">Add practice log</a>
+            <a class="btn btn-outline-primary" href="{% url 'practice:list' %}">View logs</a>
+        </div>
+    </div>
+</section>
 {% endblock %}
 
 {% block scripts %}

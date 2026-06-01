@@ -20,14 +20,15 @@
             <h1 class="home-title home-title--hero">JUANAKAS_BACHATA</h1>
             <p class="home-lead">Members-only Bachata training for dancers who want a simple path.</p>
             <p class="home-lead">Open the library, learn from the videos, and keep your practice focused.</p>
-            <p class="home-lead">Create an account now and get a 30-day free trial.</p>
+            <p class="home-lead">Create an account now and subscribe monthly to unlock the members area.</p>
 
             <div class="home-actions">
                 <a class="home-btn home-btn-primary" href="{% url 'subscriptions:pricing' %}">See Membership Plans</a>
                 {% if user.is_authenticated and has_active_membership %}
                 <a class="home-btn home-btn-secondary" href="{% url 'videos:member-library' %}">Open Member Library</a>
+                <a class="home-btn home-btn-secondary" href="{% url 'practice:list' %}">Practice Logs</a>
                 {% elif user.is_authenticated %}
-                <a class="home-btn home-btn-secondary" href="{% url 'subscriptions:pricing' %}">Activate Access</a>
+                <a class="home-btn home-btn-secondary" href="{% url 'subscriptions:pricing' %}">Subscribe Now</a>
                 {% else %}
                 <a class="home-btn home-btn-secondary" href="{% url 'signup' %}">Create Account</a>
                 {% endif %}

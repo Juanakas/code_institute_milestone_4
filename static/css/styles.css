@@ -517,7 +517,7 @@ iframe {
     }
 
     .member-video--full {
-        max-height: 68vh;
+        max-height: 72vh;
     }
 }
 
@@ -1386,10 +1386,10 @@ body.member-library-page .navbar {
 }
 
 .member-video--full {
-    width: min(100%, 1120px);
+    width: min(100%, 560px);
     height: auto;
-    aspect-ratio: 16 / 9;
-    max-height: min(72vh, 630px);
+    aspect-ratio: 9 / 16;
+    max-height: min(82vh, 760px);
     object-fit: contain;
     margin-left: auto;
     margin-right: auto;

@@ -9,4 +9,5 @@ class HomePageTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, 'JUANAKAS_BACHATA')
 		self.assertContains(response, 'Members-only Bachata training for dancers who want a simple path.')
-		self.assertContains(response, 'Create an account now and get a 30-day free trial.')
+		self.assertContains(response, 'Create an account now and subscribe monthly to unlock the members area.')
+

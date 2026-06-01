@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Subscription Active | Bachata Club{% endblock %}
+
+{% block body_class %}subscriptions-page{% endblock %}
+
+{% block content %}
+<section class="subscription-hero">
+    <div class="subscription-hero__bg" aria-hidden="true"></div>
+
+    <div class="page-shell subscription-shell subscription-shell--modern">
+        <div class="panel-card">
+            <p class="page-kicker">Payment complete</p>
+            <h1 class="page-title">Your subscription is being processed.</h1>
+            <p class="page-lead">Plan: {{ name }} at €{{ monthly_price }} / month.</p>
+            <p class="panel-text">If Stripe has finished syncing, your member library should already be open.</p>
+
+            <div class="modern-actions mt-3">
+                <a class="btn btn-primary" href="{% url 'subscriptions:status' %}">Go to subscription status</a>
+                <a class="btn btn-outline-primary" href="{% url 'videos:member-library' %}">Open member library</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

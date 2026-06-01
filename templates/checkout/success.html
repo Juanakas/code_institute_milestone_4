@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Subscription Activated | Bachata Club{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+    <h1>Subscription activated</h1>
+    {% if membership and membership.has_access %}
+        <p>Thanks — your subscription is active. You can now access the member library.</p>
+        <a class="btn btn-primary" href="{% url 'videos:member-library' %}">Open Member Library</a>
+    {% else %}
+        <p>We couldn't detect an active subscription on your account. If you used Stripe, wait a minute for the webhook to sync.</p>
+        <a class="btn btn-outline-primary" href="{% url 'subscriptions:status' %}">Subscription status</a>
+    {% endif %}
+</div>
+{% endblock %}

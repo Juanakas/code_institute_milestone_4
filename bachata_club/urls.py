@@ -20,6 +20,8 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
 
+from subscriptions.webhooks import stripe_webhook
+
 urlpatterns = [
     path('', RedirectView.as_view(pattern_name='home:index', permanent=False)),
     path('', include('home.urls')),
@@ -27,6 +29,8 @@ urlpatterns = [
     path('practice/', include('practice.urls')),
     path('members/', include('videos.urls')),
     path('subscriptions/', include('subscriptions.urls')),
+    path('checkout/', include('checkout.urls')),
+    path('subscriptions/webhook/', stripe_webhook, name='stripe-webhook'),
     path('admin/', admin.site.urls),
 ]
 

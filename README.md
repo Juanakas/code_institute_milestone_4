@@ -247,6 +247,47 @@ Expected hosted file names:
 
 After verifying playback from the external host, you can stop shipping MP4 binaries in app deployments.
 
+#### Local development using an alternate video folder
+
+For local development you can point the application at a different directory containing your MP4 files by setting the `VIDEO_LOCAL_DIR` environment variable to the absolute path. This is useful when you keep large video files outside the repo (for example in `videos2`). Example (PowerShell):
+
+```powershell
+$env:VIDEO_LOCAL_DIR = 'C:\Users\juanc\OneDrive\Documents\web_developer\code_institute\14_milestione4\videos2'
+```
+
+The app will prefer files from `VIDEO_LOCAL_DIR` when present; this is intended for local testing only. For Heroku/production, continue using `VIDEO_BASE_URL` or hosted CDN storage instead of `VIDEO_LOCAL_DIR`.
+
+### Upload helper: push local videos to S3 / R2
+
+I added `scripts/upload_videos.py` — a small Python helper that uploads `*.mp4` files from a local folder (for example `videos2`) to an S3 bucket or an S3-compatible endpoint (Cloudflare R2).
+
+Quick steps:
+
+1. Install the dependency:
+
+```powershell
+pip install boto3
+```
+
+2. Run the uploader (example for Cloudflare R2 with custom endpoint):
+
+```powershell
+python scripts/upload_videos.py --local-dir "videos2" --bucket my-r2-bucket \
+	--provider r2 --endpoint-url https://<account_id>.r2.cloudflarestorage.com \
+	--public-base-url https://<your-cf-worker-or-hosted-cdn>/videos --acl public-read
+```
+
+3. After successful uploads, set the `VIDEO_BASE_URL` on Heroku to the public base URL (without trailing slash):
+
+```powershell
+heroku config:set VIDEO_BASE_URL=https://<your-cf-worker-or-hosted-cdn>/videos --app your-app-name
+```
+
+Notes:
+- The script constructs public object URLs using the provided `--public-base-url` if given. This is the recommended approach for Cloudflare R2 where you might serve files via a Worker or a CDN front.
+- For AWS S3, the script will default to `https://{bucket}.s3.amazonaws.com/{prefix}/{filename}` if `--public-base-url` is omitted.
+- If your bucket requires signed URLs (not public), you can skip `--public-base-url` and generate signed URLs separately.
+
 ### Accessibility Testing
 
 Accessibility practices implemented:

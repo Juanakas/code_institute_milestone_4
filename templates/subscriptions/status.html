@@ -14,12 +14,12 @@
             <header class="page-header subscription-header subscription-header--modern">
                 <div class="subscription-header__copy">
                     <p class="page-kicker">Account</p>
-                    <h1 class="page-title">Your access.</h1>
-                    <p class="page-lead">See your status and return to the member videos.</p>
+                    <h1 class="page-title">Your subscription.</h1>
+                    <p class="page-lead">See your Stripe billing status and return to the member videos.</p>
                 </div>
                 <div class="subscription-header__note">
                     <p class="home-kicker">Current state</p>
-                    <p class="panel-text">Keep your access visible at a glance.</p>
+                    <p class="panel-text">Keep your membership and billing details visible at a glance.</p>
                 </div>
             </header>
 
@@ -37,6 +37,7 @@
 
                     <h2 class="panel-title mt-3">{{ membership.days_remaining }} day{{ membership.days_remaining|pluralize }} remaining</h2>
                     <p class="panel-text">Current period ends: {{ membership.current_period_end|default:"Not available yet" }}</p>
+                    <p class="panel-text">Plan: {{ name }} at €{{ monthly_price }} / month</p>
 
                     <div class="subscription-meter" aria-hidden="true">
                         <div class="subscription-meter__fill" style="width: {% if membership.has_access %}82{% else %}18{% endif %}%"></div>
@@ -45,19 +46,23 @@
                     <div class="modern-actions mt-3">
                         {% if membership.has_access %}
                             <a class="btn btn-success" href="{% url 'videos:member-library' %}">Open Member Library</a>
-                        {% else %}
-                            <form method="post" action="{% url 'subscriptions:activate_free' %}">
+                            <form method="post" action="{% url 'subscriptions:manage' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-primary">Start free 30-day access</button>
+                                <button type="submit" class="btn btn-outline-primary">Manage in Stripe</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'subscriptions:checkout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Subscribe now</button>
                             </form>
                         {% endif %}
                     </div>
                     {% else %}
                     <h2 class="panel-title">No subscription record yet</h2>
-                    <p class="panel-text">Create access first, then the member videos will unlock here.</p>
-                    <form method="post" action="{% url 'subscriptions:activate_free' %}">
+                    <p class="panel-text">Choose the monthly plan first, then the member videos will unlock here.</p>
+                    <form method="post" action="{% url 'subscriptions:checkout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">Start free 30-day access</button>
+                        <button type="submit" class="btn btn-primary">Subscribe now</button>
                     </form>
                     {% endif %}
                 </div>
@@ -78,7 +83,7 @@
                 <h2 class="panel-title">What access includes</h2>
                 <ul class="home-list home-list--compact">
                     <li>Members-only video lessons</li>
-                    <li>Library access</li>
+                    <li>Recurring Stripe subscription</li>
                 </ul>
             </div>
 

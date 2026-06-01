@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout (dev) | Bachata Club{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+    <h1>Checkout Preview</h1>
+    <p>This is a development preview of the checkout flow. No external Stripe calls will be made.</p>
+    <p>Price: €{{ monthly_price }}</p>
+    <form method="post" action="{% url 'checkout:dev_complete_payment' %}">
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Complete payment (dev)</button>
+    </form>
+</div>
+{% endblock %}

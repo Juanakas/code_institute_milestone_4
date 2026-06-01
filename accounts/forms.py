@@ -16,6 +16,12 @@ class SignUpForm(UserCreationForm):
             raise forms.ValidationError('This email is already in use.')
         return email
 
+    def clean_username(self):
+        username = self.cleaned_data['username'].strip()
+        if ' ' in username:
+            raise forms.ValidationError('Username cannot contain spaces.')
+        return username
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email'].lower().strip()

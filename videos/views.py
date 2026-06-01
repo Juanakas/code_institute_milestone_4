@@ -22,7 +22,7 @@ VIDEO_LIBRARY = [
 		'description': 'Beginner-friendly partnerwork focused on frame, connection, and clear lead-and-follow basics.',
 		'level': VideoLesson.BEGINNER,
 		'release_date': date(2025, 8, 19),
-		'filename': '20250819_beginner.mp4',
+		'filename': '20251023_beginner.mp4',
 		'poster': 'images/video-posters/20250819_beginner.svg',
 		'captions': 'vtt/20250819_beginner.vtt',
 		'duration': '12 min',
@@ -43,7 +43,7 @@ VIDEO_LIBRARY = [
 		'description': 'Intermediate practice for cleaner turns, timing control, and smoother partner transitions.',
 		'level': VideoLesson.INTERMEDIATE,
 		'release_date': date(2025, 10, 23),
-		'filename': '20251023_intermediate.mp4',
+		'filename': '20250819_intermediate.mp4',
 		'poster': 'images/video-posters/20251023_intermediate.svg',
 		'captions': 'vtt/20251023_intermediate.vtt',
 		'duration': '14 min',
@@ -64,7 +64,7 @@ VIDEO_LIBRARY = [
 		'description': 'Advanced partnerwork that adds musicality, styling, and flow through the combination.',
 		'level': VideoLesson.ADVANCED,
 		'release_date': date(2025, 11, 8),
-		'filename': '20251108_advanced.mp4',
+		'filename': '20260422_advanced.mp4',
 		'poster': 'images/video-posters/20251108_advanced.svg',
 		'captions': 'vtt/20251108_advanced.vtt',
 		'duration': '16 min',
@@ -153,7 +153,16 @@ def lesson_video(request, slug):
 	if not lesson:
 		raise Http404('Video not found')
 
-	video_path = Path(settings.BASE_DIR) / 'videos' / lesson['filename']
+	# Allow overriding the local video directory for development/testing.
+	# Set the absolute path in the environment variable `VIDEO_LOCAL_DIR`.
+	# Example (PowerShell):
+	# $env:VIDEO_LOCAL_DIR = 'C:\\Users\\juanc\\OneDrive\\Documents\\web_developer\\code_institute\\14_milestione4\\videos2'
+	local_dir = os.getenv('VIDEO_LOCAL_DIR', '').strip()
+	if local_dir:
+		video_path = Path(local_dir) / lesson['filename']
+	else:
+		video_path = Path(settings.BASE_DIR) / 'videos' / lesson['filename']
+
 	if not video_path.exists():
 		raise Http404('Video file not found')
 

@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from decimal import Decimal
 
 import dj_database_url
 from dotenv import load_dotenv
@@ -34,6 +35,7 @@ _env_allowed_hosts = [
 ]
 
 ALLOWED_HOSTS = [
+    'testserver',
     '.herokuapp.com',
     *[host for host in _env_allowed_hosts if host],
 ]
@@ -58,6 +60,7 @@ INSTALLED_APPS = [
     'accounts',
     'videos',
     'subscriptions.apps.SubscriptionsConfig',
+    'checkout',
     'practice',
 ]
 
@@ -152,8 +155,16 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY', '')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
+STRIPE_SUBSCRIPTION_PRICE_ID = os.getenv('STRIPE_SUBSCRIPTION_PRICE_ID', '')
+SUBSCRIPTION_NAME = 'Members Area Subscription'
+SUBSCRIPTION_MONTHLY_PRICE = Decimal('19.99')
+STRIPE_CURRENCY = 'eur'
+
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'videos:member-library'
+LOGIN_REDIRECT_URL = 'subscriptions:status'
 LOGOUT_REDIRECT_URL = 'home:index'
 
 CSRF_TRUSTED_ORIGINS = [

@@ -1,9 +1,7 @@
-import datetime
-
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
-from django.utils import timezone
+from django.urls import reverse
 
 from subscriptions.models import Membership
 
@@ -16,7 +14,10 @@ class MemberLoginView(LoginView):
 	def get_success_url(self):
 		if self.request.user.is_staff:
 			return '/admin/'
-		return super().get_success_url()
+		membership = Membership.objects.filter(user_id=self.request.user.id).first()
+		if membership and membership.has_access:
+			return reverse('videos:member-library')
+		return reverse('subscriptions:pricing')
 
 
 def signup(request):
@@ -27,12 +28,7 @@ def signup(request):
 		form = SignUpForm(request.POST)
 		if form.is_valid():
 			user = form.save()
-			membership, _ = Membership.objects.get_or_create(user=user)
-			membership.status = Membership.STATUS_ACTIVE
-			membership.current_period_end = timezone.now() + datetime.timedelta(days=30)
-			membership.save(update_fields=['status', 'current_period_end', 'updated_at'])
-
-			messages.success(request, 'Your account is ready and your free 30-day membership is now active. Log in to open the members library.')
+			messages.success(request, 'Your account is ready. Choose the monthly subscription to unlock the members library.')
 			return redirect('login')
 	else:
 		form = SignUpForm()

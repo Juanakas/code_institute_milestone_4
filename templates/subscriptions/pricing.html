@@ -13,54 +13,51 @@
         <header class="page-header subscription-header subscription-header--modern">
             <div class="subscription-header__copy">
                 <p class="page-kicker">Membership</p>
-                <h1 class="page-title">Choose a plan.</h1>
-                <p class="page-lead">Open the member videos and start training.</p>
+                <h1 class="page-title">Join the members area.</h1>
+                <p class="page-lead">Pay €19.99 per month and keep your access active while the subscription runs.</p>
             </div>
             <div class="subscription-header__note">
                 <p class="home-kicker">Member library</p>
-                <p class="panel-text">Simple access to the member area.</p>
+                <p class="panel-text">One subscription, one library, no trial period.</p>
             </div>
         </header>
 
         <div class="subscription-layout">
             <section class="subscription-main panel-card">
                 <div class="subscription-section-heading">
-                    <p class="page-kicker">Plans</p>
-                    <h2 class="panel-title">Select a plan</h2>
+                    <p class="page-kicker">Plan</p>
+                    <h2 class="panel-title">Monthly access to the library</h2>
                 </div>
 
                 <div class="panel-grid subscription-grid">
-                {% for plan in plans %}
                 <article class="subscription-plan-card panel-tile d-flex flex-column h-100">
                     <div>
-                        <p class="home-card__kicker">{{ plan.name }}</p>
-                        <h3 class="panel-title">€{{ plan.monthly_price }} <span class="fs-6 fw-normal">/ month</span></h3>
+                        <p class="home-card__kicker">{{ name }}</p>
+                        <h3 class="panel-title">€{{ monthly_price }} <span class="fs-6 fw-normal">/ month</span></h3>
                     </div>
                     <ul class="subscription-feature-list mt-3 mb-4">
                         <li>Members-only videos</li>
-                        <li>Direct access to the library</li>
+                        <li>Stripe billing handled monthly</li>
+                        <li>No free trial</li>
                     </ul>
                     <div class="mt-auto">
                         {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'subscriptions:activate_free' %}">
+                        <form method="post" action="{% url 'checkout:create_checkout_session' %}">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-primary w-100">Start free 30-day access</button>
+                            <button type="submit" class="btn btn-primary w-100">Subscribe now</button>
                         </form>
                         {% else %}
-                        <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}" class="btn btn-primary w-100">Log in to activate</a>
+                        <a href="{% url 'login' %}?next={% url 'subscriptions:pricing' %}" class="btn btn-primary w-100">Log in to subscribe</a>
                         {% endif %}
                     </div>
                 </article>
-                {% empty %}
-                <div class="message-panel">No active plans configured yet. Add a plan in admin.</div>
-                {% endfor %}
                 </div>
             </section>
 
             <aside class="content-side subscription-sidebar">
                 <section class="panel-card">
                     <p class="page-kicker">Why it works</p>
-                    <h2 class="panel-title">Simple and focused</h2>
+                    <h2 class="panel-title">Simple monthly billing</h2>
                 </section>
 
                 <section class="panel-card">
@@ -68,15 +65,46 @@
                     <h2 class="panel-title">Dancers who want clarity</h2>
                     <ul class="home-list home-list--compact">
                         <li>Quick access to videos</li>
-                        <li>Simple training sessions</li>
+                        <li>One recurring subscription</li>
                     </ul>
                 </section>
 
                 <section class="panel-card">
                     <p class="page-kicker">Next step</p>
-                    <h2 class="panel-title">Join and open videos</h2>
+                    <h2 class="panel-title">Subscribe and open videos</h2>
                     <div class="modern-actions mt-3">
                         <a class="btn btn-outline-primary" href="{% url 'videos:member-library' %}">View Member Library</a>
+                    </div>
+                </section>
+
+                <section class="panel-card">
+                    <p class="page-kicker">Questions</p>
+                    <h2 class="panel-title">Quick FAQ</h2>
+                    <div class="accordion accordion-flush mt-3" id="pricingFaq">
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqOneHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne" aria-expanded="false" aria-controls="faqOne">
+                                    Can I cancel any time?
+                                </button>
+                            </h3>
+                            <div id="faqOne" class="accordion-collapse collapse" aria-labelledby="faqOneHeading" data-bs-parent="#pricingFaq">
+                                <div class="accordion-body">
+                                    Yes. Open the subscription status page and manage the plan from there.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqTwoHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqTwo" aria-expanded="false" aria-controls="faqTwo">
+                                    What happens after payment?
+                                </button>
+                            </h3>
+                            <div id="faqTwo" class="accordion-collapse collapse" aria-labelledby="faqTwoHeading" data-bs-parent="#pricingFaq">
+                                <div class="accordion-body">
+                                    Your membership becomes active and the members library opens right away.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </aside>

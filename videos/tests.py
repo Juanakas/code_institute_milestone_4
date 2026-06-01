@@ -30,6 +30,8 @@ class MemberLibraryTests(TestCase):
 		self.assertContains(response, '<video', html=False)
 		self.assertContains(response, 'track kind="captions"', html=False)
 		self.assertContains(response, 'controlslist="nodownload noplaybackrate"', html=False)
+		self.assertContains(response, 'Add practice log')
+		self.assertContains(response, 'View logs')
 
 	def test_lesson_video_endpoint_serves_mp4(self):
 		response = self.client.get(reverse('videos:lesson-video', kwargs={'slug': 'beginner-partnerwork-combination-1'}))
