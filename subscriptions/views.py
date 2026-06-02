@@ -6,8 +6,68 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 import stripe
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 from .models import Membership, SubscriptionPlan
+
+
+def _sync_membership_from_subscription(membership, subscription):
+    period_end_value = subscription.get('current_period_end')
+    fallback_period_end = timezone.now() + timedelta(days=30)
+    period_end = datetime.fromtimestamp(period_end_value, tz=timezone.get_current_timezone()) if period_end_value else fallback_period_end
+    if period_end < fallback_period_end:
+        period_end = fallback_period_end
+
+    price_id = ''
+    items = subscription.get('items')
+    if items and items.get('data'):
+        price = items['data'][0].get('price', {})
+        price_id = price.get('id', '')
+
+    membership.stripe_customer_id = subscription.get('customer', '')
+    membership.stripe_subscription_id = subscription.get('id', '')
+    membership.stripe_price_id = price_id
+    membership.status = subscription.get('status', Membership.STATUS_ACTIVE)
+    membership.cancel_at_period_end = subscription.get('cancel_at_period_end', False)
+    membership.current_period_end = period_end
+    membership.save(update_fields=['stripe_customer_id', 'stripe_subscription_id', 'stripe_price_id', 'status', 'cancel_at_period_end', 'current_period_end', 'updated_at'])
+
+
+def _activate_membership_from_session(request):
+    session_id = request.GET.get('session_id', '').strip()
+    if not session_id or not settings.STRIPE_SECRET_KEY:
+        return None
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+    except stripe.error.StripeError:
+        return None
+
+    session_user_id = str(session.get('client_reference_id') or session.get('metadata', {}).get('user_id') or '')
+    if session_user_id and session_user_id != str(request.user.id):
+        return None
+
+    payment_status = (session.get('payment_status') or '').lower()
+    if payment_status not in {'paid', 'no_payment_required'}:
+        return None
+
+    if session.get('mode') != 'subscription':
+        return None
+
+    subscription_id = session.get('subscription')
+    if not subscription_id:
+        return None
+
+    try:
+        subscription = stripe.Subscription.retrieve(subscription_id)
+    except stripe.error.StripeError:
+        return None
+
+    membership, _ = Membership.objects.get_or_create(user=request.user)
+    _sync_membership_from_subscription(membership, subscription)
+    return membership
 
 
 def _subscription_display_data():
@@ -77,6 +137,11 @@ def create_checkout_session(request):
 
 @login_required
 def subscription_success(request):
+    membership = _activate_membership_from_session(request)
+    if membership and membership.has_access:
+        messages.success(request, 'Payment successful. Your members area is now unlocked.', extra_tags='popup')
+        return redirect('videos:member-library')
+
     context = _subscription_display_data()
     context['membership'] = getattr(request.user, 'membership', None)
     return render(request, 'subscriptions/success.html', context)
@@ -84,6 +149,11 @@ def subscription_success(request):
 
 @login_required
 def subscription_status(request):
+    membership = getattr(request.user, 'membership', None)
+    if membership and membership.status in {Membership.STATUS_ACTIVE, Membership.STATUS_TRIALING} and not membership.current_period_end:
+        membership.current_period_end = timezone.now() + timedelta(days=30)
+        membership.save(update_fields=['current_period_end', 'updated_at'])
+
     context = _subscription_display_data()
     context['membership'] = getattr(request.user, 'membership', None)
     return render(request, 'subscriptions/status.html', context)

@@ -47,6 +47,48 @@ class SubscriptionPageTests(TestCase):
 		self.assertEqual(response.status_code, 302)
 		self.assertEqual(response['Location'], 'https://checkout.stripe.test/session')
 
+	@patch('subscriptions.views.stripe.Subscription.retrieve')
+	@patch('subscriptions.views.stripe.checkout.Session.retrieve')
+	def test_subscription_success_activates_membership_and_redirects_to_library(self, mock_session_retrieve, mock_subscription_retrieve):
+		mock_session_retrieve.return_value = {
+			'id': 'cs_test_123',
+			'mode': 'subscription',
+			'payment_status': 'paid',
+			'client_reference_id': str(self.user.id),
+			'subscription': 'sub_123',
+		}
+		mock_subscription_retrieve.return_value = {
+			'id': 'sub_123',
+			'customer': 'cus_123',
+			'status': 'active',
+			'cancel_at_period_end': False,
+			'current_period_end': int((timezone.now() + timedelta(days=30)).timestamp()),
+			'items': {'data': [{'price': {'id': 'price_123'}}]},
+		}
+
+		response = self.client.get(reverse('subscriptions:subscription_success') + '?session_id=cs_test_123')
+
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(response.url, reverse('videos:member-library'))
+		membership = Membership.objects.get(user=self.user)
+		self.assertTrue(membership.has_access)
+		self.assertEqual(membership.status, Membership.STATUS_ACTIVE)
+		self.assertTrue(membership.current_period_end >= timezone.now() + timedelta(days=29))
+
+	def test_status_page_backfills_missing_current_period_end_for_active_membership(self):
+		membership = self.user.membership
+		membership.status = membership.STATUS_ACTIVE
+		membership.current_period_end = None
+		membership.save()
+
+		response = self.client.get(reverse('subscriptions:status'))
+
+		self.assertEqual(response.status_code, 200)
+		membership.refresh_from_db()
+		self.assertTrue(membership.current_period_end)
+		self.assertTrue(membership.has_access)
+		self.assertContains(response, '30 day')
+
 	@patch('subscriptions.webhooks.stripe.Webhook.construct_event')
 	@patch('subscriptions.webhook_handler.stripe.Subscription.retrieve')
 	def test_webhook_marks_membership_active(self, mock_retrieve, mock_construct_event):
