@@ -9,7 +9,7 @@ import stripe
 
 from subscriptions.models import Membership, SubscriptionPlan
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from .forms import CheckoutFeedbackForm, CheckoutPreviewForm
 
@@ -19,6 +19,60 @@ def _get_price_id():
     if plan and plan.stripe_price_id:
         return plan.stripe_price_id
     return getattr(settings, 'STRIPE_SUBSCRIPTION_PRICE_ID', '')
+
+
+def _sync_membership_from_subscription(membership, subscription):
+    period_end_value = subscription.get('current_period_end')
+    period_end = datetime.fromtimestamp(period_end_value, tz=timezone.get_current_timezone()) if period_end_value else None
+    price_id = ''
+    items = subscription.get('items')
+    if items and items.get('data'):
+        price = items['data'][0].get('price', {})
+        price_id = price.get('id', '')
+
+    membership.stripe_customer_id = subscription.get('customer', '')
+    membership.stripe_subscription_id = subscription.get('id', '')
+    membership.stripe_price_id = price_id
+    membership.status = subscription.get('status', Membership.STATUS_INCOMPLETE)
+    membership.cancel_at_period_end = subscription.get('cancel_at_period_end', False)
+    membership.current_period_end = period_end
+    membership.save(update_fields=['stripe_customer_id', 'stripe_subscription_id', 'stripe_price_id', 'status', 'cancel_at_period_end', 'current_period_end', 'updated_at'])
+
+
+def _activate_membership_from_checkout_session(request):
+    session_id = request.GET.get('session_id', '').strip()
+    if not session_id or not settings.STRIPE_SECRET_KEY:
+        return False
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+    except stripe.error.StripeError:
+        return False
+
+    session_user_id = str(session.get('client_reference_id') or session.get('metadata', {}).get('user_id') or '')
+    if session_user_id and session_user_id != str(request.user.id):
+        return False
+
+    payment_status = (session.get('payment_status') or '').lower()
+    if payment_status not in {'paid', 'no_payment_required'}:
+        return False
+
+    if session.get('mode') != 'subscription':
+        return False
+
+    subscription_id = session.get('subscription')
+    if not subscription_id:
+        return False
+
+    try:
+        subscription = stripe.Subscription.retrieve(subscription_id)
+    except stripe.error.StripeError:
+        return False
+
+    membership, _ = Membership.objects.get_or_create(user=request.user)
+    _sync_membership_from_subscription(membership, subscription)
+    return membership.has_access
 
 
 @login_required
@@ -97,8 +151,15 @@ def dev_complete_payment(request):
 
 @login_required
 def success(request):
-    membership = getattr(request.user, 'membership', None)
+    _activate_membership_from_checkout_session(request)
+    membership, _ = Membership.objects.get_or_create(user=request.user)
+
+    if request.method == 'GET' and membership.has_access and request.GET.get('session_id'):
+        messages.success(request, 'Payment successful. Your members area is now unlocked.', extra_tags='popup')
+        return redirect('videos:member-library')
+
     # Subscription activation in production is handled by Stripe webhooks.
+    # This view also verifies Stripe Checkout return session_id as a fallback.
     # In debug mode without Stripe credentials, dev_complete_payment handles activation.
 
     feedback_form = CheckoutFeedbackForm()

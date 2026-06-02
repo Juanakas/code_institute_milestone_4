@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
@@ -51,15 +52,37 @@ class CheckoutSecurityTests(TestCase):
         self.assertFalse(membership.has_access)
 
     @override_settings(DEBUG=False)
-    def test_success_with_session_id_does_not_activate_membership_in_production(self):
+    @patch('checkout.views.stripe.Subscription.retrieve')
+    @patch('checkout.views.stripe.checkout.Session.retrieve')
+    def test_success_with_session_id_activates_membership_in_production(self, mock_session_retrieve, mock_subscription_retrieve):
         self.client.force_login(self.user)
+        mock_session_retrieve.return_value = {
+            'id': 'cs_test_123',
+            'mode': 'subscription',
+            'payment_status': 'paid',
+            'client_reference_id': str(self.user.id),
+            'subscription': 'sub_test_123',
+        }
+        mock_subscription_retrieve.return_value = {
+            'id': 'sub_test_123',
+            'customer': 'cus_test_123',
+            'status': Membership.STATUS_ACTIVE,
+            'cancel_at_period_end': False,
+            'current_period_end': int((timezone.now() + timedelta(days=30)).timestamp()),
+            'items': {
+                'data': [
+                    {'price': {'id': 'price_test_123'}},
+                ]
+            },
+        }
 
-        response = self.client.get(reverse('checkout:success') + '?session_id=fake_session')
+        response = self.client.get(reverse('checkout:success') + '?session_id=cs_test_123')
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('videos:member-library'))
         membership = Membership.objects.get(user=self.user)
-        self.assertEqual(membership.status, Membership.STATUS_INCOMPLETE)
-        self.assertFalse(membership.has_access)
+        self.assertEqual(membership.status, Membership.STATUS_ACTIVE)
+        self.assertTrue(membership.has_access)
 
     @override_settings(DEBUG=True)
     def test_dev_complete_payment_rejects_missing_required_fields(self):
